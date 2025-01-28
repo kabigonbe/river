@@ -235,7 +235,7 @@
 //                heatmapColors: ["red", "yellow", "#377eb8", "#4daf4a", "#984ea3", "#eeeeee"],
 //                areas: areas
 //            });
-            fetch('https://kabigonbe.github.io/river/farm_products.json')
+            fetch('https://kabigonbe.github.io/river/farm_products2.json')
                 .then(response => response.json())
                 .then(data => {
                     rankings = data["rankings"]; // 取得したランキングデータを格納
@@ -246,6 +246,8 @@
                         $rankingSelect.append(`<option value="${rankingName}">${rankingName}</option>`);
                     });
 
+	            	$rankingSelect.prop('selectedIndex', 0); // インデックスを設定
+	            	$rankingSelect.trigger('change'); // ドロップダウンの変更イベントをトリガー
                     renderMap('米');
 
                     // ランキング切り替えイベント
@@ -276,7 +278,8 @@
 
                 const ranking = rankings[rankingName];
 			    // 上位5位までのデータを取得
-			    const top5 = ranking.slice(0, 5);
+			    const top5 = ranking.sort((a, b) => a.rank - b.rank);
+//			    const top5 = ranking.slice(0, 47);
 			    // ランキング表示用のHTML生成
 			    let rankingHtml = `<h2>${rankingName}ランキング</h2>`;
 			    rankingHtml += '<table class="ranking-table" >';
@@ -284,7 +287,7 @@
 			    top5.forEach((item, index) => {
 			        rankingHtml += `
 			            <tr>
-			                <td>${index + 1}</td>
+			                <td>${item["rank"]}</td>
 			                <td align="left">${item["都道府県名"]}</td>
 			                <td align="right">${item["産出額"]}</td>
 			                <td align="right">${item["構成比"]}</td>
@@ -308,7 +311,7 @@
                         name: pref.name,
 						"構成比":rankData ? rankData.rank : "-",
 						"産出額":rankData ? rankData.rank : "-",
-                        number: rankData ? rankData.rank : 47 // ランキング外は47
+                        number: rankData ? rankData.rank : 48 // ランキング外は47
                     };
                 });
                 // #jmapをクリアして再描画
@@ -355,7 +358,7 @@
             <select id="ranking-select" class="dropdown"></select>
 			<button id="next-button" class="next-button">次へ</button>
         </div>
-        <div id="ranking-display" class="ranking-display"></div>
         <div id="jmap" class="map-container"></div>
+        <div id="ranking-display" class="ranking-display"></div>
     </div></body>
 </html>
