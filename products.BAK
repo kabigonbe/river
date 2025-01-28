@@ -10,12 +10,12 @@
 		    padding: 0;
 		    background-color: #f9f9f9;
 		    color: #333;
-		    line-height: 1.6;
+		    line-height: 1.8;
 		}
 		
 		/* コンテナ全体 */
 		.container {
-		    max-width: 1000px;
+		    max-width: 1200px; /* 地図の最大幅を確保 */
 		    margin: 0 auto;
 		    padding: 15px;
 		}
@@ -25,9 +25,9 @@
 		    text-align: center;
 		    background-color: #377eb8;
 		    color: #fff;
-		    padding: 15px;
+		    padding: 20px;
 		    border-radius: 8px;
-		    margin-bottom: 15px;
+		    margin-bottom: 20px;
 		}
 		
 		.header h1 {
@@ -40,27 +40,28 @@
 		    display: flex;
 		    justify-content: center;
 		    align-items: center;
-		    flex-wrap: wrap; /* 狭い画面で折り返す */
-		    margin-bottom: 15px;
+		    flex-wrap: wrap;
+		    margin-bottom: 20px;
 		}
 		
 		.controls label {
 		    margin-right: 10px;
 		    font-weight: bold;
+		    font-size: 16px;
 		}
 		
 		.dropdown {
-		    padding: 8px;
+		    padding: 12px;
 		    border: 1px solid #ccc;
 		    border-radius: 5px;
-		    font-size: 14px;
+		    font-size: 16px;
 		    outline: none;
-		    transition: all 0.3s ease;
+		    width: 100%;
 		    max-width: 300px;
-		    width: 100%; /* 狭い画面では全幅 */
+		    transition: all 0.3s ease;
 		}
 		
-		.dropdown:hover, 
+		.dropdown:hover,
 		.dropdown:focus {
 		    border-color: #377eb8;
 		    box-shadow: 0 0 5px rgba(55, 126, 184, 0.5);
@@ -68,37 +69,71 @@
 		
 		/* ランキング表示エリア */
 		.ranking-display {
-		    margin-bottom: 15px;
+		    margin-bottom: 20px;
 		    background-color: #fff;
-		    padding: 15px;
+		    padding: 20px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
-		    overflow-x: auto;
 		}
 		
 		/* 地図表示エリア */
 		.map-container {
 		    background-color: #fff;
-		    padding: 15px;
+		    padding: 20px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
 		    margin: 0 auto;
-		    max-width: 640px; /* 地図エリアの幅を調整 */
-		    height: 480px; /* 地図エリアの高さ */
+		    max-width: 100%; /* 地図エリアを画面幅に合わせる */
+		    height: 600px; /* 高さを大きく確保 */
 		}
 		
 		/* 地図エリアの調整（スマホ向け） */
 		@media (max-width: 768px) {
 		    .map-container {
 		        max-width: 100%;
-		        height: 360px; /* 中型画面用の高さ調整 */
+		        height: 500px; /* 中型画面用の高さ調整 */
+		    }
+		
+		    .header h1 {
+		        font-size: 22px;
+		    }
+		
+		    .controls label {
+		        font-size: 14px;
+		    }
+		
+		    .dropdown {
+		        font-size: 14px;
+		        padding: 10px;
 		    }
 		}
 		
 		@media (max-width: 480px) {
 		    .map-container {
 		        max-width: 100%;
-		        height: 300px; /* スマホ用の高さ調整 */
+		        height: 400px; /* スマホ用の高さ調整 */
+		    }
+		
+		    .ranking-display {
+		        padding: 10px;
+		    }
+		
+		    .header h1 {
+		        font-size: 20px; /* スマホ用ヘッダー文字サイズ */
+		    }
+		
+		    .controls label {
+		        font-size: 14px;
+		    }
+		
+		    .dropdown {
+		        font-size: 14px;
+		        padding: 10px;
+		    }
+		
+		    .ranking-table th,
+		    .ranking-table td {
+		        font-size: 14px; /* テーブルの文字サイズを調整 */
 		    }
 		}
 		
@@ -122,7 +157,7 @@
 		
 		.ranking-table th,
 		.ranking-table td {
-		    padding: 10px 12px;
+		    padding: 12px 15px;
 		    text-align: center;
 		    font-size: 14px;
 		}
@@ -139,29 +174,6 @@
 		.ranking-table tbody tr:first-child td {
 		    font-weight: bold;
 		    color: #d9534f; /* 1位を赤で強調 */
-		}
-		
-		/* レスポンシブ対応 */
-		@media (max-width: 768px) {
-		    .ranking-display {
-		        padding: 10px;
-		    }
-		
-		    .ranking-table th,
-		    .ranking-table td {
-		        font-size: 12px;
-		    }
-		}
-		
-		@media (max-width: 480px) {
-		    .ranking-display {
-		        padding: 8px;
-		    }
-		
-		    .ranking-table th,
-		    .ranking-table td {
-		        font-size: 10px;
-		    }
 		}
     </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

@@ -115,25 +115,25 @@
 		    }
 		
 		    .ranking-display {
-		        padding: 10px;
+		        padding: 20px;
 		    }
 		
 		    .header h1 {
-		        font-size: 20px; /* スマホ用ヘッダー文字サイズ */
+		        font-size: 40px; /* スマホ用ヘッダー文字サイズ */
 		    }
 		
 		    .controls label {
-		        font-size: 14px;
+		        font-size: 28px;
 		    }
 		
 		    .dropdown {
-		        font-size: 14px;
-		        padding: 10px;
+		        font-size: 28px;
+		        padding: 20px;
 		    }
 		
 		    .ranking-table th,
 		    .ranking-table td {
-		        font-size: 14px; /* テーブルの文字サイズを調整 */
+		        font-size: 28px; /* テーブルの文字サイズを調整 */
 		    }
 		}
 		
@@ -142,9 +142,9 @@
 		    border-collapse: collapse;
 		    width: 100%;
 		    font-family: 'Arial', sans-serif;
-		    margin: 15px 0;
-		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		    border-radius: 8px;
+		    margin: 30px 0;
+		    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+		    border-radius: 16px;
 		    overflow: hidden;
 		}
 		
@@ -157,9 +157,9 @@
 		
 		.ranking-table th,
 		.ranking-table td {
-		    padding: 12px 15px;
+		    padding: 24px 30px;
 		    text-align: center;
-		    font-size: 14px;
+		    font-size: 28px;
 		}
 		
 		.ranking-table tbody tr:nth-child(even) {
@@ -291,8 +291,8 @@
 
 			    // 地図描画のサイズを動的に計算
 			    const isMobile = window.innerWidth <= 768; // 768px以下をモバイルと判断
-			    const mapWidth = isMobile ? window.innerWidth - 30 : Math.min(window.innerWidth * 0.8, 1000); // 幅を動的に調整
-			    const mapHeight = isMobile ? window.innerHeight * 0.6 : 600; // 高さを動的に調整
+			    const mapWidth = isMobile ? window.innerWidth - 30 : Math.min(window.innerWidth * 0.9, 1100); // 幅を動的に調整
+			    const mapHeight = isMobile ? window.innerHeight * 0.8 : 1000; // 高さを動的に調整
 
                 const areas = allPrefectures.map(pref => {
                     const rankData = ranking.find(rank => rank.code === pref.code);
