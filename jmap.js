@@ -575,10 +575,10 @@
                         if( range == '') {
                             if( str.match(/>/) ) range = '超';
                             if( str.match(/</) ) range = '未満';
-                            if( str.match(/=/) ) range = '等しい';
+                            if( str.match(/==/) ) range = '';
                         }
 
-                        value = parseInt( str.replace('>=','').replace('<=','').replace('<','').replace('<','') );
+                        value = parseInt( str.replace('>=','').replace('<=','').replace('<','').replace('<','').replace('==','') );
                         text = value.toLocaleString() + params.heatmapLabelUnit + range;
 
                     } else {

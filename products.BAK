@@ -277,7 +277,6 @@
                 const ranking = rankings[rankingName];
 			    // 上位5位までのデータを取得
 			    const top5 = ranking.slice(0, 5);
-			    console.log('上位5位データ:', top5);
 			    // ランキング表示用のHTML生成
 			    let rankingHtml = `<h2>${rankingName}ランキング</h2>`;
 			    rankingHtml += '<table class="ranking-table" >';
@@ -322,7 +321,7 @@
 					fontSize: '1.8rem',
 					height:mapHeight,
                     heatmapLabelUnit: '位',
-                    heatmapConditions: ["==1", "==2", "==3", "==4", "==5", ">=6"],
+                    heatmapConditions: ["==1", "==2", "==3", "==4", "==5", "6>="],
                     heatmapColors: ["red", "#df5353", "#e55d5d", "#ee7f7f", "#fae1e1", "#bfc7ce"],
 					heatmapFontColors: ["#fff","#fff","#fff","#fff","#000","#fff"],
                     areas: areas
