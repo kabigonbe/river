@@ -17,7 +17,7 @@
 		.container {
 		    max-width: 1200px; /* 地図の最大幅を確保 */
 		    margin: 0 auto;
-		    padding: 15px;
+		    padding: 10px;
 		}
 		
 		/* ヘッダー */
@@ -25,12 +25,17 @@
 		    text-align: center;
 		    background-color: #377eb8;
 		    color: #fff;
-		    padding: 10px;
+		    padding: 2px;
 		    border-radius: 8px;
-		    margin-bottom: 20px;
+		    margin-bottom: 10px;
 		}
 		
 		.header h1 {
+		    font-size: 48px;
+		    margin: 0;
+		}
+		
+		.header h2 {
 		    font-size: 48px;
 		    margin: 0;
 		}
@@ -51,7 +56,7 @@
 		}
 		
 		.dropdown {
-			width: 200px;
+			width: 450px;
 		    padding: 10px 10px;
 		    border: 1px solid #ccc;
 		    border-radius: 5px;
@@ -61,6 +66,9 @@
 		    background-color: #f9f9f9;
 		    cursor: pointer;
 		    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			align: center;
+			text-align: center;
+			text-align-last: center;
 		}
 		
 		/* ホバーとフォーカス時のスタイル */
@@ -107,7 +115,7 @@
 		.ranking-display {
 		    margin-bottom: 10px;
 		    background-color: #fff;
-		    padding: 10px;
+		    padding: 5px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
 		}
@@ -143,7 +151,7 @@
 		
 		.ranking-table th,
 		.ranking-table td {
-		    padding: 12px 15px;
+		    padding: 6px 10px;
 		    text-align: center;
 		    font-size: 28px;
 		}
@@ -231,7 +239,6 @@
                 .then(response => response.json())
                 .then(data => {
                     rankings = data["rankings"]; // 取得したランキングデータを格納
-					console.log('取得したランキングデータ:', rankings);
 
                     // ランキング選択メニューを生成
                     const $rankingSelect = $('#ranking-select');
@@ -312,7 +319,7 @@
                     showHeatmap: true,
                     showHeatlabel: true,
 					width:mapWidth,
-					fontSize: '0.8rem',
+					fontSize: '1.8rem',
 					height:mapHeight,
                     heatmapLabelUnit: '位',
                     heatmapConditions: ["==1", "==2", "==3", "==4", "==5", ">=6"],
