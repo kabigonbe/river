@@ -3,6 +3,7 @@
     <meta charset="UTF-8">
     <title>Jmap jQuery Example</title>
     <style>
+		/* 全体のスタイル */
 		body {
 		    font-family: 'Arial', sans-serif;
 		    margin: 0;
@@ -22,7 +23,7 @@
 		/* ヘッダー */
 		.header {
 		    text-align: center;
-		    background-color: #377eb8; /* メインカラー */
+		    background-color: #377eb8;
 		    color: #fff;
 		    padding: 20px;
 		    border-radius: 8px;
@@ -30,20 +31,21 @@
 		}
 		
 		.header h1 {
-		    font-size: 28px;
+		    font-size: 24px;
 		    margin: 0;
 		}
 		
 		/* コントロールエリア */
 		.controls {
 		    display: flex;
+		    flex-direction: column; /* スマホで縦並び */
 		    justify-content: center;
 		    align-items: center;
 		    margin-bottom: 20px;
 		}
 		
 		.controls label {
-		    margin-right: 10px;
+		    margin-bottom: 5px;
 		    font-weight: bold;
 		}
 		
@@ -53,6 +55,8 @@
 		    border-radius: 5px;
 		    font-size: 16px;
 		    outline: none;
+		    width: 100%; /* スマホでは幅いっぱい */
+		    max-width: 300px; /* PCでは適度な幅 */
 		    transition: all 0.3s ease;
 		}
 		
@@ -69,6 +73,7 @@
 		    padding: 20px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
+		    overflow-x: auto; /* スクロール対応 */
 		}
 		
 		/* 地図表示エリア */
@@ -77,59 +82,89 @@
 		    padding: 20px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
-		    height: 600px; /* マップの高さを調整 */
+		    height: 400px; /* 初期サイズ */
+		    width: 100%;
+		    max-width: 480px;
+		    margin: 0 auto;
 		}
-        /* テーブルのスタイル */
-        .ranking-table {
-            border-collapse: collapse;
-            width: 100%;
-            font-family: 'Arial', sans-serif;
-            margin: 20px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .ranking-table thead tr {
-            background-color: #377eb8; /* ヘッダーの背景色 */
-            color: #ffffff; /* ヘッダーの文字色 */
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .ranking-table th,
-        .ranking-table td {
-            padding: 12px 15px;
-            text-align: center;
-        }
-
-        .ranking-table tbody tr:nth-child(even) {
-            background-color: #f2f2f2; /* 偶数行の背景色 */
-        }
-
-        .ranking-table tbody tr:nth-child(odd) {
-            background-color: #ffffff; /* 奇数行の背景色 */
-        }
-
-        .ranking-table tbody tr:hover {
-            background-color: #ffebcd; /* ホバー時の背景色 */
-            transition: background-color 0.3s ease;
-        }
-
-        .ranking-table td {
-            font-size: 14px;
-            color: #333333;
-        }
-
-        .ranking-table th {
-            font-size: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .ranking-table tbody tr:first-child td {
-            font-weight: bold;
-            color: #d9534f; /* 1位の行を特別に赤で強調 */
-        }
+		
+		/* テーブルのスタイル */
+		.ranking-table {
+		    border-collapse: collapse;
+		    width: 100%;
+		    font-family: 'Arial', sans-serif;
+		    margin: 20px 0;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		    border-radius: 8px;
+		    overflow: hidden;
+		}
+		
+		.ranking-table thead tr {
+		    background-color: #377eb8; /* ヘッダーの背景色 */
+		    color: #ffffff; /* ヘッダーの文字色 */
+		    text-align: left;
+		    font-weight: bold;
+		}
+		
+		.ranking-table th,
+		.ranking-table td {
+		    padding: 12px 15px;
+		    text-align: center;
+		    font-size: 14px;
+		}
+		
+		.ranking-table tbody tr:nth-child(even) {
+		    background-color: #f2f2f2;
+		}
+		
+		.ranking-table tbody tr:hover {
+		    background-color: #ffebcd;
+		    transition: background-color 0.3s ease;
+		}
+		
+		.ranking-table tbody tr:first-child td {
+		    font-weight: bold;
+		    color: #d9534f; /* 1位を赤で強調 */
+		}
+		
+		/* レスポンシブ対応 */
+		@media (max-width: 768px) {
+		    .header h1 {
+		        font-size: 20px; /* ヘッダー文字縮小 */
+		    }
+		
+		    .map-container {
+		        height: 300px; /* 地図エリアの高さ縮小 */
+		    }
+		
+		    .ranking-display {
+		        padding: 15px; /* ランキングエリアの余白調整 */
+		    }
+		
+		    .ranking-table th,
+		    .ranking-table td {
+		        font-size: 12px; /* テーブルの文字サイズ縮小 */
+		    }
+		}
+		
+		@media (max-width: 480px) {
+		    .header h1 {
+		        font-size: 18px; /* ヘッダー文字さらに縮小 */
+		    }
+		
+		    .map-container {
+		        height: 250px; /* 地図エリアの高さ縮小 */
+		    }
+		
+		    .ranking-display {
+		        padding: 10px; /* よりコンパクトに */
+		    }
+		
+		    .ranking-table th,
+		    .ranking-table td {
+		        font-size: 10px; /* スマホ向けに文字サイズを最小化 */
+		    }
+		}
     </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="./jmap.js"></script>
