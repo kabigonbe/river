@@ -25,7 +25,7 @@
 		    text-align: center;
 		    background-color: #377eb8;
 		    color: #fff;
-		    padding: 20px;
+		    padding: 10px;
 		    border-radius: 8px;
 		    margin-bottom: 20px;
 		}
@@ -51,7 +51,8 @@
 		}
 		
 		.dropdown {
-		    padding: 10px 20px;
+			width: 200px;
+		    padding: 10px 10px;
 		    border: 1px solid #ccc;
 		    border-radius: 5px;
 		    font-size: 32px;
@@ -69,33 +70,44 @@
 		    background-color: #eef6ff;
 		}
 		
-/* ボタンのスタイル */
-.button {
-	width :10em;
-	height :3em;
-    padding: 15px 30px; /* ボタンを大きくする */
-    border: none; /* 枠線を削除 */
-    border-radius: 12px; /* 角を丸く */
-    font-size: 18px; /* ボタンの文字サイズを設定 */
-    font-weight: bold; /* 太字 */
-    color: white; /* ボタンの文字色を白に */
-    background: linear-gradient(135deg, #377eb8, #559de8); /* グラデーション背景 */
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 軽い影を追加 */
-}
-/* ボタンのホバーおよびフォーカス時 */
-.button:hover,
-.button:focus {
-    background: linear-gradient(135deg, #559de8, #377eb8); /* 色を反転 */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* 影を強調 */
-}
+		/* ボタンのスタイル */
+		.controls button {
+		    padding: 15px 15px; /* ボタンを大きくする */
+		    border: none; /* 枠線を削除 */
+		    border-radius: 12px; /* 角を丸く */
+		    font-size: 18px; /* ボタンの文字サイズを設定 */
+		    font-weight: bold; /* 太字 */
+		    cursor: pointer;
+		    text-align: center;
+		    transition: all 0.3s ease;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 軽い影を追加 */
+		}
+		/* ボタンのホバーおよびフォーカス時 */
+		.controls button:hover,
+		.controls button:focus {
+		    background: linear-gradient(135deg, #559de8, #377eb8); /* 色を反転 */
+		    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* 影を強調 */
+		}
+		
+		/* ボタンとドロップダウンの間の余白 */
+		.controls button,
+		.dropdown {
+		    margin: 10px 5px; /* 上下10px、左右15pxの余白 */
+		}
+		
+		/* ボタン同士の間の余白 */
+		.controls .prev-button {
+		    margin-right: 5px; /* ドロップダウンとの距離を広げる */
+		}
+		
+		.controls .next-button {
+		    margin-left: 5px; /* ドロップダウンとの距離を広げる */
+		}
 		/* ランキング表示エリア */
 		.ranking-display {
-		    margin-bottom: 20px;
+		    margin-bottom: 10px;
 		    background-color: #fff;
-		    padding: 20px;
+		    padding: 10px;
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
 		}
@@ -300,6 +312,7 @@
                     showHeatmap: true,
                     showHeatlabel: true,
 					width:mapWidth,
+					fontSize: '1.8rem',
 					height:mapHeight,
                     heatmapLabelUnit: '位',
                     heatmapConditions: ["==1", "==2", "==3", "==4", "==5", ">=6"],
@@ -332,7 +345,6 @@
             <h1>農産物別都道府県情報</h1>
         </header>
         <div class="controls">
-            <label for="ranking-select">ランキングを選択:</label>
 			<button id="prev-button" class="prev-button">前へ</button>
             <select id="ranking-select" class="dropdown"></select>
 			<button id="next-button" class="next-button">次へ</button>
