@@ -2,135 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Jmap jQuery Example</title>
-    <style>
-		body {
-		    font-family: 'Arial', sans-serif;
-		    margin: 0;
-		    padding: 0;
-		    background-color: #f9f9f9;
-		    color: #333;
-		    line-height: 1.6;
-		}
-		
-		/* コンテナ全体 */
-		.container {
-		    max-width: 1200px;
-		    margin: 0 auto;
-		    padding: 20px;
-		}
-		
-		/* ヘッダー */
-		.header {
-		    text-align: center;
-		    background-color: #377eb8; /* メインカラー */
-		    color: #fff;
-		    padding: 20px;
-		    border-radius: 8px;
-		    margin-bottom: 20px;
-		}
-		
-		.header h1 {
-		    font-size: 28px;
-		    margin: 0;
-		}
-		
-		/* コントロールエリア */
-		.controls {
-		    display: flex;
-		    justify-content: center;
-		    align-items: center;
-		    margin-bottom: 20px;
-		}
-		
-		.controls label {
-		    margin-right: 10px;
-		    font-weight: bold;
-		}
-		
-		.dropdown {
-		    padding: 10px;
-		    border: 1px solid #ccc;
-		    border-radius: 5px;
-		    font-size: 16px;
-		    outline: none;
-		    transition: all 0.3s ease;
-		}
-		
-		.dropdown:hover, 
-		.dropdown:focus {
-		    border-color: #377eb8;
-		    box-shadow: 0 0 5px rgba(55, 126, 184, 0.5);
-		}
-		
-		/* ランキング表示エリア */
-		.ranking-display {
-		    margin-bottom: 20px;
-		    background-color: #fff;
-		    padding: 20px;
-		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		    border-radius: 8px;
-		}
-		
-		/* 地図表示エリア */
-		.map-container {
-		    background-color: #fff;
-		    padding: 20px;
-		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		    border-radius: 8px;
-		    height: 600px; /* マップの高さを調整 */
-		}
-        /* テーブルのスタイル */
-        .ranking-table {
-            border-collapse: collapse;
-            width: 100%;
-            font-family: 'Arial', sans-serif;
-            margin: 20px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .ranking-table thead tr {
-            background-color: #377eb8; /* ヘッダーの背景色 */
-            color: #ffffff; /* ヘッダーの文字色 */
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .ranking-table th,
-        .ranking-table td {
-            padding: 12px 15px;
-            text-align: center;
-        }
-
-        .ranking-table tbody tr:nth-child(even) {
-            background-color: #f2f2f2; /* 偶数行の背景色 */
-        }
-
-        .ranking-table tbody tr:nth-child(odd) {
-            background-color: #ffffff; /* 奇数行の背景色 */
-        }
-
-        .ranking-table tbody tr:hover {
-            background-color: #ffebcd; /* ホバー時の背景色 */
-            transition: background-color 0.3s ease;
-        }
-
-        .ranking-table td {
-            font-size: 14px;
-            color: #333333;
-        }
-
-        .ranking-table th {
-            font-size: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .ranking-table tbody tr:first-child td {
-            font-weight: bold;
-            color: #d9534f; /* 1位の行を特別に赤で強調 */
-        }
-    </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="./jmap.js"></script>
     <script type = "text/javascript">
@@ -227,15 +98,15 @@
 			    console.log('上位5位データ:', top5);
 			    // ランキング表示用のHTML生成
 			    let rankingHtml = `<h2>${rankingName}ランキング</h2>`;
-			    rankingHtml += '<table class="ranking-table" >';
-			    rankingHtml += '<tr><th>順位</th><th>都道府県名</th><th>産出額 (億円)</th><th>構成比 (%)</th></tr>';
+			    rankingHtml += '<table border="1" style="border-collapse: collapse; width: 100%;">';
+			    rankingHtml += '<tr><th>順位</th><th>都道府県名</th><th>産出額 (万円)</th><th>構成比 (%)</th></tr>';
 			    top5.forEach((item, index) => {
 			        rankingHtml += `
 			            <tr>
 			                <td>${index + 1}</td>
-			                <td align="left">${item["都道府県名"]}</td>
-			                <td align="right">${item["産出額"]}</td>
-			                <td align="right">${item["構成比"]}</td>
+			                <td>${item["都道府県名"]}</td>
+			                <td>${item["産出額"]}</td>
+			                <td>${item["構成比"]}</td>
 			            </tr>
 			        `;
 			    });
@@ -261,12 +132,9 @@
                 $('#jmap').jmap({
                     showHeatmap: true,
                     showHeatlabel: true,
-					width:480,
-					height:480,
                     heatmapLabelUnit: '位',
                     heatmapConditions: ["==1", "==2", "==3", "==4", "==5", ">=6"],
                     heatmapColors: ["red", "yellow", "#377eb8", "#4daf4a", "#984ea3", "#eeeeee"],
-					heatmapFontColors: ["#fff","#000","#fff","#fff","#fff","#fff"],
                     areas: areas
                 });
             }
@@ -289,15 +157,12 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>農産物別都道府県情報</h1>
-        </header>
-        <div class="controls">
-            <label for="ranking-select">ランキングを選択:</label>
-            <select id="ranking-select" class="dropdown"></select>
-        </div>
-        <div id="ranking-display" class="ranking-display"></div>
-        <div id="jmap" class="map-container"></div>
-    </div></body>
+    <h1>都道府県情報</h1>
+    <label for="ranking-select">ランキングを選択:</label>
+    <select id="ranking-select"></select>
+    <p id="number-display"></p>
+    <!-- ランキング表示用エリア -->
+    <div id="ranking-display"></div>
+    <div id="jmap"></div>
+</body>
 </html>
