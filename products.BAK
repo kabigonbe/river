@@ -324,7 +324,7 @@
                     heatmapLabelUnit: '位',
                     heatmapConditions: ["==1", "==2", "==3", "==4", "==5", ">=6"],
                     heatmapColors: ["red", "#df5353", "#e55d5d", "#ee7f7f", "#fae1e1", "#bfc7ce"],
-					heatmapFontColors: ["#fff","#fff","#fff","#fff","#fff","#fff"],
+					heatmapFontColors: ["#fff","#fff","#fff","#fff","#000","#fff"],
                     areas: areas
                 });
             }
