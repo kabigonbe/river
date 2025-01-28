@@ -31,7 +31,7 @@
 		}
 		
 		.header h1 {
-		    font-size: 24px;
+		    font-size: 48px;
 		    margin: 0;
 		}
 		
@@ -47,26 +47,50 @@
 		.controls label {
 		    margin-right: 10px;
 		    font-weight: bold;
-		    font-size: 16px;
+		    font-size: 32px;
 		}
 		
 		.dropdown {
-		    padding: 12px;
+		    padding: 10px 20px;
 		    border: 1px solid #ccc;
 		    border-radius: 5px;
-		    font-size: 16px;
+		    font-size: 32px;
 		    outline: none;
-		    width: 100%;
-		    max-width: 300px;
 		    transition: all 0.3s ease;
+		    background-color: #f9f9f9;
+		    cursor: pointer;
+		    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		}
 		
-		.dropdown:hover,
-		.dropdown:focus {
+		/* ホバーとフォーカス時のスタイル */
+		.dropdown:hover, .dropdown:focus {
 		    border-color: #377eb8;
 		    box-shadow: 0 0 5px rgba(55, 126, 184, 0.5);
+		    background-color: #eef6ff;
 		}
 		
+/* ボタンのスタイル */
+.button {
+	width :10em;
+	height :3em;
+    padding: 15px 30px; /* ボタンを大きくする */
+    border: none; /* 枠線を削除 */
+    border-radius: 12px; /* 角を丸く */
+    font-size: 18px; /* ボタンの文字サイズを設定 */
+    font-weight: bold; /* 太字 */
+    color: white; /* ボタンの文字色を白に */
+    background: linear-gradient(135deg, #377eb8, #559de8); /* グラデーション背景 */
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 軽い影を追加 */
+}
+/* ボタンのホバーおよびフォーカス時 */
+.button:hover,
+.button:focus {
+    background: linear-gradient(135deg, #559de8, #377eb8); /* 色を反転 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* 影を強調 */
+}
 		/* ランキング表示エリア */
 		.ranking-display {
 		    margin-bottom: 20px;
@@ -83,58 +107,8 @@
 		    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		    border-radius: 8px;
 		    margin: 0 auto;
-		    max-width: 100%; /* 地図エリアを画面幅に合わせる */
-		    height: 600px; /* 高さを大きく確保 */
-		}
-		
-		/* 地図エリアの調整（スマホ向け） */
-		@media (max-width: 768px) {
-		    .map-container {
-		        max-width: 100%;
-		        height: 500px; /* 中型画面用の高さ調整 */
-		    }
-		
-		    .header h1 {
-		        font-size: 22px;
-		    }
-		
-		    .controls label {
-		        font-size: 14px;
-		    }
-		
-		    .dropdown {
-		        font-size: 14px;
-		        padding: 10px;
-		    }
-		}
-		
-		@media (max-width: 480px) {
-		    .map-container {
-		        max-width: 100%;
-		        height: 400px; /* スマホ用の高さ調整 */
-		    }
-		
-		    .ranking-display {
-		        padding: 10px;
-		    }
-		
-		    .header h1 {
-		        font-size: 20px; /* スマホ用ヘッダー文字サイズ */
-		    }
-		
-		    .controls label {
-		        font-size: 14px;
-		    }
-		
-		    .dropdown {
-		        font-size: 14px;
-		        padding: 10px;
-		    }
-		
-		    .ranking-table th,
-		    .ranking-table td {
-		        font-size: 14px; /* テーブルの文字サイズを調整 */
-		    }
+		    max-width: 100%;
+		    max-height: 100%;
 		}
 		
 		/* テーブルのスタイル */
@@ -143,8 +117,8 @@
 		    width: 100%;
 		    font-family: 'Arial', sans-serif;
 		    margin: 15px 0;
-		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		    border-radius: 8px;
+		    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+		    border-radius: 16px;
 		    overflow: hidden;
 		}
 		
@@ -159,7 +133,7 @@
 		.ranking-table td {
 		    padding: 12px 15px;
 		    text-align: center;
-		    font-size: 14px;
+		    font-size: 28px;
 		}
 		
 		.ranking-table tbody tr:nth-child(even) {
@@ -253,7 +227,6 @@
                         $rankingSelect.append(`<option value="${rankingName}">${rankingName}</option>`);
                     });
 
-                    // 初期描画（いちごランキングでスタート）
                     renderMap('米');
 
                     // ランキング切り替えイベント
@@ -261,6 +234,22 @@
                         const selectedRanking = $(this).val();
                         renderMap(selectedRanking);
                     });
+
+
+	            	$('#next-button').on('click', function () {
+	            	    const currentIndex = $rankingSelect.prop('selectedIndex'); // 現在の選択インデックスを取得
+	            	    const nextIndex = (currentIndex + 1) % $rankingSelect.children().length; // 次のインデックスを計算
+	            	    $rankingSelect.prop('selectedIndex', nextIndex); // インデックスを設定
+	            	    $rankingSelect.trigger('change'); // ドロップダウンの変更イベントをトリガー
+	            	});
+					$('#prev-button').on('click', function () {
+					    const currentIndex = $rankingSelect.prop('selectedIndex'); // 現在の選択インデックスを取得
+					    const totalOptions = $rankingSelect.children().length; // オプションの総数
+					    const prevIndex = (currentIndex - 1 + totalOptions) % totalOptions; // 次のインデックスを計算（負の値に対応）
+					    $rankingSelect.prop('selectedIndex', prevIndex); // インデックスを設定
+					    $rankingSelect.trigger('change'); // ドロップダウンの変更イベントをトリガー
+					});
+
                 })
                 .catch(error => console.error('ランキングデータの読み込みに失敗しました:', error));
 
@@ -291,8 +280,8 @@
 
 			    // 地図描画のサイズを動的に計算
 			    const isMobile = window.innerWidth <= 768; // 768px以下をモバイルと判断
-			    const mapWidth = isMobile ? window.innerWidth - 30 : Math.min(window.innerWidth * 0.8, 1000); // 幅を動的に調整
-			    const mapHeight = isMobile ? window.innerHeight * 0.6 : 600; // 高さを動的に調整
+			    const mapWidth = isMobile ? window.innerWidth - 30 : Math.min(window.innerWidth * 0.9, 1100); // 幅を動的に調整
+			    const mapHeight = isMobile ? window.innerHeight * 0.8 : 1000; // 高さを動的に調整
 
                 const areas = allPrefectures.map(pref => {
                     const rankData = ranking.find(rank => rank.code === pref.code);
@@ -344,7 +333,9 @@
         </header>
         <div class="controls">
             <label for="ranking-select">ランキングを選択:</label>
+			<button id="prev-button" class="prev-button">前へ</button>
             <select id="ranking-select" class="dropdown"></select>
+			<button id="next-button" class="next-button">次へ</button>
         </div>
         <div id="ranking-display" class="ranking-display"></div>
         <div id="jmap" class="map-container"></div>
