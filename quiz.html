@@ -162,7 +162,8 @@
       try {
         const response = await fetch('https://kabigonbe.github.io/river/jsons/quiz.json');
         data = await response.json(); // ここで questions にデータを格納
-        questions = data.slice(0,5);
+//        questions = data.slice(0,5);
+        questions = data;
 //        console.log("取得したデータ:", questions);
         startQuiz(); // データ取得後にクイズを開始
       } catch (error) {
