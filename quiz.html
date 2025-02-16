@@ -12,7 +12,7 @@
       background: #f4f4f9;
       color: #333;
       text-align: center;
-      margin: 20px;
+      margin: 3px;
     }
 
     h1 {
@@ -22,7 +22,7 @@
     /* セレクトボックス & ボタン */
     select, button {
       font-size: 16px;
-      padding: 10px 15px;
+      padding: 8px 8px;
       margin: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
@@ -43,9 +43,9 @@
     /* クイズのコンテナ */
     #quiz-container {
       width: 97%;
-      margin: auto;
+      margin: 1px;
       background: white;
-      padding: 20px;
+      padding: 5px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
@@ -289,7 +289,7 @@
                 <table>
                     <tr>
                         <th>慣用句</th>
-                        <td>${q.ans1}</td>
+                        <td><a href="https://www.google.com/search?q=${q.ans1}" target="_blank">${q.ans1}</td>
                     </tr>
                     <tr>
                         <th>例文</th>
