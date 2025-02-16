@@ -5,12 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ことわざクイズ</title>
   <style>
-    body { font-family: Arial, sans-serif; }
-    .question-container { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-    .choices { margin-bottom: 10px; }
-    .choices button { margin: 5px; padding: 5px; }
-    .correct { background-color: #90EE90; } /* 正解の選択肢（緑） */
-    .incorrect { background-color: #FF6347; } /* 間違いの選択肢（赤） */  </style>
+  <style>
+    /* 全体のスタイル */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      text-align: center;
+      margin: 20px;
+    }
+
+    h1 {
+      color: #444;
+    }
+
+    /* セレクトボックス & ボタン */
+    select, button {
+      font-size: 16px;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    button {
+      background: #007BFF;
+      color: white;
+      border: none;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    /* クイズのコンテナ */
+    #quiz-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .question-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      transition: 0.3s;
+    }
+
+    .question-container:hover {
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .choices {
+      margin-bottom: 10px;
+    }
+
+    /* 選択肢ボタン */
+    .choices button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: #eee;
+      transition: 0.3s;
+    }
+
+    .choices button:hover {
+      background: #ddd;
+    }
+
+    .correct {
+      background-color: #28a745 !important;
+      color: white;
+    }
+
+    .incorrect {
+      background-color: #dc3545 !important;
+      color: white;
+    }
+
+    /* テーブルのスタイル */
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #007BFF;
+      color: white;
+    }
+
+    td {
+      background: #f9f9f9;
+    }
+
+    /* フッター */
+    #final-message {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #007BFF;
+    }
+  </style>
 </head>
 <body>
   <h1>ことわざクイズ</h1>
@@ -64,7 +178,7 @@
 
       questions.forEach((question, index) => {
         userAnswers[index] = { ans1: null, ans2: null };
-        correctAnswers[index] = { ans1: question.解答1, ans2: question.解答2 };
+        correctAnswers[index] = {問題文:question.問題文, ans1: question.解答1, ans2: question.解答2 };
 
         const questionDiv = document.createElement("div");
         questionDiv.classList.add("question-container");
@@ -129,7 +243,7 @@
           totalScore++;
         } else {
           questionDiv.style.backgroundColor = "#f8d7da"; 
-          incorrectAnswers.push(correctAnswers[questionIndex].ans1);
+          incorrectAnswers.push(correctAnswers[questionIndex]);
         }
         answeredQuestions.add(questionIndex);
         document.getElementById("total-score").textContent = totalScore;
@@ -153,13 +267,14 @@
       document.getElementById("elapsed-time").textContent = elapsedTime;
       document.getElementById("final-message").textContent = `全問解答完了！お疲れ様でした🎉`;
       if (incorrectAnswers.length > 0) {
-        let incorrectHtml = "<h2>間違った問題の正しい解答1:</h2><ul>";
-        incorrectAnswers.forEach(ans => {
-          incorrectHtml += `<li>${ans}</li>`;
+        let html = `<h2>間違った問題の正しい解答</h2><table><tr><th>慣用句</th><th>例文</th><th>意味</th></tr>`;
+        incorrectAnswers.forEach(q => {
+          html += `<tr><td>${q.ans1}</td><td>${q.問題文}</td><td>${q.ans2}</td></tr>`;
         });
-        incorrectHtml += "</ul>";
-        document.getElementById("incorrect-answers").innerHTML = incorrectHtml;
-      }    }
+        html += "</table>";
+        document.getElementById("incorrect-answers").innerHTML = html;
+      }
+    }
 
     window.onload = loadJson;
   </script>
