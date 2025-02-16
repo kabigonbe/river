@@ -9,7 +9,8 @@
     .question-container { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
     .choices { margin-bottom: 10px; }
     .choices button { margin: 5px; padding: 5px; }
-  </style>
+    .correct { background-color: #90EE90; } /* 正解の選択肢（緑） */
+    .incorrect { background-color: #FF6347; } /* 間違いの選択肢（赤） */  </style>
 </head>
 <body>
   <h1>ことわざクイズ</h1>
@@ -17,6 +18,7 @@
   <p>経過時間: <span id="elapsed-time">0</span> 秒</p>
   <p>合計得点: <span id="total-score">0</span> / <span id="total-questions">0</span></p>
   <p id="final-message"></p>
+  <div id="incorrect-answers"></div>
 
   <script>
     let questions = []; // グローバル変数として questions を定義
@@ -25,6 +27,7 @@
     let answeredQuestions = new Set();
     let totalScore = 0;
     let startTime = Date.now();
+    let incorrectAnswers = [];
 
     // JSONデータを取得する関数
     async function loadJson() {
@@ -40,6 +43,7 @@
 
     function startQuiz() {
       document.getElementById("total-questions").textContent = questions.length;
+      incorrectAnswers = [];
       createQuiz();
       updateElapsedTime();
     }
@@ -56,6 +60,7 @@
       const quizContainer = document.getElementById("quiz-container");
       const allAns1 = questions.map(q => q.解答1);
       const allAns2 = questions.map(q => q.解答2);
+      document.getElementById("incorrect-answers").innerHTML = "";
 
       questions.forEach((question, index) => {
         userAnswers[index] = { ans1: null, ans2: null };
@@ -107,7 +112,14 @@
       if (userAnswers[questionIndex][setType] !== null) return;
 
       userAnswers[questionIndex][setType] = selected;
-      container.querySelectorAll("button").forEach(button => button.disabled = true);
+      container.querySelectorAll("button").forEach(button => {
+        if (button.textContent === correctAnswers[questionIndex][setType]) {
+          button.classList.add("correct"); // 正解なら緑
+        } else if (button.textContent === selected) {
+          button.classList.add("incorrect"); // 間違いなら赤
+        }
+        button.disabled = true;
+      });
 
       const current = userAnswers[questionIndex];
       if (current.ans1 !== null && current.ans2 !== null) {
@@ -117,6 +129,7 @@
           totalScore++;
         } else {
           questionDiv.style.backgroundColor = "#f8d7da"; 
+          incorrectAnswers.push(correctAnswers[questionIndex].ans1);
         }
         answeredQuestions.add(questionIndex);
         document.getElementById("total-score").textContent = totalScore;
@@ -139,7 +152,14 @@
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById("elapsed-time").textContent = elapsedTime;
       document.getElementById("final-message").textContent = `全問解答完了！お疲れ様でした🎉`;
-    }
+      if (incorrectAnswers.length > 0) {
+        let incorrectHtml = "<h2>間違った問題の正しい解答1:</h2><ul>";
+        incorrectAnswers.forEach(ans => {
+          incorrectHtml += `<li>${ans}</li>`;
+        });
+        incorrectHtml += "</ul>";
+        document.getElementById("incorrect-answers").innerHTML = incorrectHtml;
+      }    }
 
     window.onload = loadJson;
   </script>
