@@ -31,7 +31,7 @@
 
     button {
       background: #007BFF;
-      color: white;
+      color: #222;
       border: none;
       transition: 0.3s;
     }
@@ -94,8 +94,8 @@
 
     /* テーブルのスタイル */
     table {
-      width: 90%;
-      margin: 20px auto;
+      width: 97%;
+      margin: 1px auto;
       border-collapse: collapse;
       background: white;
       border-radius: 10px;
@@ -109,7 +109,8 @@
     }
 
     th {
-      background: #007BFF;
+      width:50px;
+      background:gray;
       color: white;
     }
 
@@ -119,19 +120,31 @@
 
     /* フッター */
     #final-message {
+      font-size: 30px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: red;
+    }
+    #total-score {
       font-size: 18px;
       font-weight: bold;
       margin-top: 20px;
-      color: #007BFF;
+      color: blue;
+    }
+    #elapsed-time {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: blue;
     }
   </style>
 </head>
 <body>
   <h1>ことわざクイズ</h1>
   <div id="quiz-container"></div>
+  <p id="final-message"></p>
   <p>経過時間: <span id="elapsed-time">0</span> 秒</p>
   <p>合計得点: <span id="total-score">0</span> / <span id="total-questions">0</span></p>
-  <p id="final-message"></p>
   <div id="incorrect-answers"></div>
 
   <script>
@@ -148,7 +161,7 @@
       try {
         const response = await fetch('https://kabigonbe.github.io/river/jsons/quiz.json');
         questions = await response.json(); // ここで questions にデータを格納
-        console.log("取得したデータ:", questions);
+//        console.log("取得したデータ:", questions);
         startQuiz(); // データ取得後にクイズを開始
       } catch (error) {
         console.error('エラー:', error);
@@ -250,7 +263,9 @@
 
         if (answeredQuestions.size === questions.length) {
           endQuiz();
-        }
+        }else{
+          scrollToNextQuestion(questionIndex);
+		}
       }
     }
 
@@ -266,16 +281,39 @@
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById("elapsed-time").textContent = elapsedTime;
       document.getElementById("final-message").textContent = `全問解答完了！お疲れ様でした🎉`;
-      if (incorrectAnswers.length > 0) {
-        let html = `<h2>間違った問題の正しい解答</h2><table><tr><th>慣用句</th><th>例文</th><th>意味</th></tr>`;
+    if (incorrectAnswers.length > 0) {
+        let html = `<h2>間違った問題の正しい解答</h2>`;
+        
         incorrectAnswers.forEach(q => {
-          html += `<tr><td>${q.ans1}</td><td>${q.問題文}</td><td>${q.ans2}</td></tr>`;
+            html += `
+                <table>
+                    <tr>
+                        <th>慣用句</th>
+                        <td>${q.ans1}</td>
+                    </tr>
+                    <tr>
+                        <th>例文</th>
+                        <td>${q.問題文}</td>
+                    </tr>
+                    <tr>
+                        <th>意味</th>
+                        <td>${q.ans2}</td>
+                    </tr>
+                </table>
+                <br>
+            `;
         });
-        html += "</table>";
         document.getElementById("incorrect-answers").innerHTML = html;
       }
+	  document.getElementById("final-message").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function scrollToNextQuestion(currentIndex) {
+      const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
+      if (nextQuestion) {
+        nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
     window.onload = loadJson;
   </script>
 </body>
