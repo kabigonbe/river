@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>語句のたしなみ</title>
+  <style>
+    /* 全体のスタイル */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      text-align: center;
+      margin: 3px;
+    }
+
+    h1 {
+      color: #444;
+    }
+
+    /* セレクトボックス & ボタン */
+    select, button {
+      font-size: 16px;
+      padding: 8px 8px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    button {
+      background: #007BFF;
+      color: #222;
+      border: none;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #elapsed-time-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    /* クイズのコンテナ */
+    #quiz-container {
+      width: 97%;
+      margin: 1px;
+      background: white;
+      padding: 5px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .question-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      transition: 0.3s;
+    }
+
+    .question-container:hover {
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .choices {
+      margin-bottom: 10px;
+    }
+
+    /* 選択肢ボタン */
+    .choices button {
+      padding: 10px;
+      margin: 2px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: #eee;
+      transition: 0.3s;
+    }
+
+    .choices button:hover {
+      background: #ddd;
+    }
+
+    .correct {
+      background-color: #28a745 !important;
+      color: white;
+    }
+
+    .incorrect {
+      background-color: #dc3545 !important;
+      color: white;
+    }
+
+    /* テーブルのスタイル */
+    table {
+      width: 97%;
+      margin: 1px auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      width:50px;
+      background:gray;
+      color: white;
+    }
+
+    td {
+      background: #f9f9f9;
+    }
+
+    /* フッター */
+    #final-message {
+      font-size: 30px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: red;
+    }
+    #total-score {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: blue;
+    }
+    #elapsed-time {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: blue;
+    }
+  </style>
+</head>
+  <div class="controls">
+      <select id="category-select" class="dropdown"></select>
+  </div>
+  <h1 style="font-family: 'Times New Roman', '游明朝', 'Yu Mincho', serif;">語句のたしなみ</h1>
+  <div id="elapsed-time-container">
+    <p>経過時間: <span id="elapsed-time">0</span> 秒</p>
+    <p>合計得点: <span id="total-score">0</span> / <span id="total-questions">0</span></p>
+  </div>
+  <div id="quiz-container"></div>
+  <p id="final-message"></p>
+  <button id="retry-button" onclick="retryIncorrect()" style="display: none;">間違った問題だけやり直す</button>
+  <div id="incorrect-answers"></div>
+
+  <script>
+    let questions = []; // グローバル変数として questions を定義
+    let userAnswers = []; 
+    let correctAnswers = [];
+    let answeredQuestions = new Set();
+    let totalScore = 0;
+    let startTime = Date.now();
+    let incorrectAnswers = [];
+
+    // JSONデータを取得する関数
+    async function loadJson() {
+      try {
+        const response = await fetch('https://kabigonbe.github.io/river/jsons/words.json');
+        data = await response.json(); // ここで questions にデータを格納
+//        questions = data.slice(0,5);
+        const $categorySelect = document.getElementById("category-select");
+        Object.keys(data).forEach(categoryName => {
+          let option = document.createElement("option");
+          option.value = categoryName;
+          option.textContent = categoryName;
+          $categorySelect.appendChild(option);
+        });
+
+        // 初回のカテゴリを選択
+        $categorySelect.selectedIndex = 0;
+        questions = data[$categorySelect.value] || [];
+
+
+        $categorySelect.addEventListener("change", function () {
+          questions = data[this.value] || [];
+          init();
+          startQuiz();
+        });
+
+        startQuiz();
+
+      } catch (error) {
+        console.error('エラー:', error);
+      }
+    }
+
+    function startQuiz() {
+      document.getElementById("total-questions").textContent = questions.length;
+      incorrectAnswers = [];
+      createQuiz();
+      updateElapsedTime();
+    }
+
+    function getRandomChoices(answersList, n, correctAnswer) {
+      const filtered = answersList.filter(ans => ans !== correctAnswer);
+      const shuffled = filtered.sort(() => 0.5 - Math.random());
+      const choices = shuffled.slice(0, n - 1);
+      choices.push(correctAnswer);
+      return choices.sort(() => 0.5 - Math.random());
+    }
+
+    function createQuiz() {
+      const quizContainer = document.getElementById("quiz-container");
+      quizContainer.innerHTML = "";
+      const allAns1 = questions.map(q => q.解答1);
+      const allAns2 = questions.map(q => q.解答2);
+      document.getElementById("incorrect-answers").innerHTML = "";
+
+      questions.forEach((question, index) => {
+        userAnswers[index] = { ans1: null, ans2: null };
+        correctAnswers[index] = {問題文:question.問題文, ans1: question.解答1, ans2: question.解答2 };
+
+        const questionDiv = document.createElement("div");
+        questionDiv.classList.add("question-container");
+        questionDiv.setAttribute("id", `question-${index}`);
+
+        const questionText = document.createElement("p");
+        questionText.textContent = question.問題文;
+        questionDiv.appendChild(questionText);
+
+        const title1 = document.createElement("p");
+        title1.textContent = "【選択肢１】";
+        questionDiv.appendChild(title1);
+
+        const choicesContainer1 = document.createElement("div");
+        choicesContainer1.classList.add("choices");
+        const choices1 = getRandomChoices(allAns1, 5, question.解答1);
+        choices1.forEach(choice => {
+          const button = document.createElement("button");
+          button.textContent = choice;
+          button.onclick = () => checkAnswer(index, "ans1", choice, choicesContainer1, questionDiv);
+          choicesContainer1.appendChild(button);
+        });
+        questionDiv.appendChild(choicesContainer1);
+
+        const title2 = document.createElement("p");
+        title2.textContent = "【選択肢２】";
+        questionDiv.appendChild(title2);
+
+        const choicesContainer2 = document.createElement("div");
+        choicesContainer2.classList.add("choices");
+        const choices2 = getRandomChoices(allAns2, 5, question.解答2);
+        choices2.forEach(choice => {
+          const button = document.createElement("button");
+          button.textContent = choice;
+          button.onclick = () => checkAnswer(index, "ans2", choice, choicesContainer2, questionDiv);
+          choicesContainer2.appendChild(button);
+        });
+        questionDiv.appendChild(choicesContainer2);
+
+        quizContainer.appendChild(questionDiv);
+      });
+    }
+
+    function checkAnswer(questionIndex, setType, selected, container, questionDiv) {
+      if (userAnswers[questionIndex][setType] !== null) return;
+
+      userAnswers[questionIndex][setType] = selected;
+      container.querySelectorAll("button").forEach(button => {
+        if (button.textContent === correctAnswers[questionIndex][setType]) {
+          button.classList.add("correct"); // 正解なら緑
+        } else if (button.textContent === selected) {
+          button.classList.add("incorrect"); // 間違いなら赤
+        }
+        button.disabled = true;
+      });
+
+      const current = userAnswers[questionIndex];
+      if (current.ans1 !== null && current.ans2 !== null) {
+        if (current.ans1 === correctAnswers[questionIndex].ans1 &&
+            current.ans2 === correctAnswers[questionIndex].ans2) {
+          questionDiv.style.backgroundColor = "#d4edda"; 
+          totalScore++;
+        } else {
+          questionDiv.style.backgroundColor = "#f8d7da"; 
+          incorrectAnswers.push(correctAnswers[questionIndex]);
+        }
+        answeredQuestions.add(questionIndex);
+        document.getElementById("total-score").textContent = totalScore;
+
+        if (answeredQuestions.size === questions.length) {
+          endQuiz();
+        }else{
+          scrollToNextQuestion(questionIndex);
+		}
+      }
+    }
+
+    function updateElapsedTime() {
+      if (answeredQuestions.size < questions.length) {
+        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById("elapsed-time").textContent = elapsedTime;
+        setTimeout(updateElapsedTime, 1000);
+      }
+    }
+
+    function endQuiz() {
+      updateElapsedTime();
+
+      if (totalScore === questions.length) {
+          document.getElementById("final-message").textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
+      } else {
+          document.getElementById("final-message").textContent = `全問解答完了！お疲れ様でした🎉`;
+      }
+
+      if (incorrectAnswers.length > 0) {
+        let html = `<h2>間違った問題の正しい解答</h2>`;
+        
+        incorrectAnswers.forEach(q => {
+            html += `
+                <table>
+                    <tr>
+                        <th>慣用句</th>
+                        <td><a href="https://www.google.com/search?q=${q.ans1}" target="_blank">${q.ans1}</td>
+                    </tr>
+                    <tr>
+                        <th>例文</th>
+                        <td>${q.問題文}</td>
+                    </tr>
+                    <tr>
+                        <th>意味</th>
+                        <td>${q.ans2}</td>
+                    </tr>
+                </table>
+                <br>
+            `;
+        });
+        document.getElementById("incorrect-answers").innerHTML = html;
+        document.getElementById("retry-button").style.display = "block"; 
+     }
+	  document.getElementById("final-message").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function scrollToNextQuestion(currentIndex) {
+      const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
+      if (nextQuestion) {
+        nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+	function init(){
+        incorrectAnswers = []; // クリア
+		answeredQuestions.clear();
+		totalScore=0;
+		startTime=Date.now();
+        document.getElementById("total-score").textContent = totalScore;
+        document.getElementById("total-questions").textContent = questions.length;
+        document.getElementById("incorrect-answers").innerHTML = ""; // 前回の間違い一覧をクリア
+        document.getElementById("retry-button").style.display = "none"; // やり直しボタンを隠す
+	}
+
+    function retryIncorrect() {
+        if (incorrectAnswers.length > 0) {
+            filteredQuestions = incorrectAnswers; // 間違えた問題だけで新しいクイズを作成
+            questions = filteredQuestions.map(q => ({
+                問題文: q.問題文,
+                解答1: q.ans1,
+                解答2: q.ans2
+            }));
+//            console.log(filteredQuestions)
+			init();
+            createQuiz(); // クイズを再生成
+            document.getElementById("quiz-container").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
+    window.onload = loadJson;
+  </script>
+</body>
+</html>
