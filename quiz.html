@@ -44,7 +44,6 @@
     button:hover {
       background: #0056b3;
     }
-
     #elapsed-time-container {
       position: fixed;
       bottom: 10px;
@@ -78,6 +77,11 @@
       border-radius: 8px;
       background: #fff;
       transition: 0.3s;
+    }
+
+    .question-text {
+      font-size:16px;
+      font-weight: bold;
     }
 
     .question-container:hover {
@@ -159,6 +163,9 @@
       font-weight: bold;
       margin-top: 20px;
       color: blue;
+    }
+    #retry-button {
+      color: white;
     }
   </style>
 </head>
@@ -304,6 +311,7 @@
 
         const questionText = document.createElement("p");
         questionText.textContent = question.問題文;
+        questionText.classList.add("question-text");
         questionDiv.appendChild(questionText);
 
         const title1 = document.createElement("p");
