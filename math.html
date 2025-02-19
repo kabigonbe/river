@@ -2,116 +2,121 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/mathlive"></script>
-  <title>カスタムキーボード付き数式入力</title>
+  <title>分数・帯分数入力キーボード（小数対応・決定ボタン付き）</title>
+  <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-fonts.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f4f9;
-      margin: 20px;
-    }
-    h2 {
-      color: #333;
-    }
-    /* 数式表示エリア */
-    .output-container {
-      margin: 20px;
-    }
-    math-field {
-      font-size: 24px;
-      min-width: 300px;
-      height: 100px;
-      border: 2px solid #007BFF;
-      border-radius: 5px;
-      background: white;
-      padding: 10px;
-    }
-    /* キーボードボタン */
-    .keyboard {
-      margin-top: 20px;
-    }
-    .keyboard button {
-      font-size: 18px;
-      padding: 10px;
-      margin: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      background: #eee;
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #mathfield { width: 100%; min-height: 60px; border: 1px solid #ccc; padding: 10px; }
+    .keyboard { margin-top: 20px; }
+    .key {
+      display: inline-block;
       width: 60px;
-      height: 50px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      border: 1px solid #ccc;
+      margin: 3px;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #f9f9f9;
     }
-    .keyboard button:hover {
-      background: #ddd;
-    }
-    .delete-btn {
-      background: #dc3545;
-      color: white;
-    }
-    .enter-btn {
-      background: #28a745;
-      color: white;
-    }
+    .key:hover { background-color: #e0e0e0; }
+
+math-field::part(menu-toggle) {
+  display: none;
+}
+math-field::part(virtual-keyboard-toggle) {
+  display: none;
+}
+
   </style>
 </head>
 <body>
-  <h2>カスタムキーボード付き 数式入力</h2>
-
-  <div>
-    <math-field id="math-field"></math-field>
+  <h2>分数・帯分数入力キーボード</h2>
+  <!-- MathLive の MathField -->
+  <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
+  
+  <!-- カスタムキーボード（数字、.、÷、帯分数、クリア、決定） -->
+  <div class="keyboard">
+    <!-- 数字キー -->
+    <div class="key" onclick="insertDigit('7')">7</div>
+    <div class="key" onclick="insertDigit('8')">8</div>
+    <div class="key" onclick="insertDigit('9')">9</div>
+    <div class="key" onclick="mathField.executeCommand('deleteBackward')">⌫</div>
+    <div class="key" onclick="mathField.executeCommand('moveToNextPlaceholder')">次の□へ</div>
+    <br>
+    <div class="key" onclick="insertDigit('4')">4</div>
+    <div class="key" onclick="insertDigit('5')">5</div>
+    <div class="key" onclick="insertDigit('6')">6</div>
+    <div class="key" onclick="handleDivision()">分数</div>
+    <br>
+    <div class="key" onclick="insertDigit('1')">1</div>
+    <div class="key" onclick="insertDigit('2')">2</div>
+    <div class="key" onclick="insertDigit('3')">3</div>
+    <div class="key" onclick="insertMixedFraction()">帯分数</div>
+    <br>
+    <div class="key" onclick="insertDigit('0')">0</div>
+    <div class="key" onclick="insertDigit('.')">.</div>
+    <br>
+    <!-- 決定ボタン -->
+    <div class="key" onclick="clearField()">クリア</div>
+    <div class="key" onclick="commitInput()">決定</div>
   </div>
-
-  <div>
-    <button onclick="insertSymbol('1')">1</button>
-    <button onclick="insertSymbol('2')">2</button>
-    <button onclick="insertSymbol('3')">3</button>
-    <button onclick="insertSymbol('+')">＋</button>
-    <button onclick="insertSymbol('-')">−</button>
-    <br>
-    <button onclick="insertSymbol('4')">4</button>
-    <button onclick="insertSymbol('5')">5</button>
-    <button onclick="insertSymbol('6')">6</button>
-    <button onclick="insertSymbol('\\times')">×</button>
-    <button onclick="insertSymbol('\\div')">÷</button>
-    <br>
-    <button onclick="insertSymbol('7')">7</button>
-    <button onclick="insertSymbol('8')">8</button>
-    <button onclick="insertSymbol('9')">9</button>
-    <button onclick="insertSymbol('=')">＝</button>
-    <button onclick="deleteLast()">⌫</button>
-    <br>
-    <button onclick="insertSymbol('0')">0</button>
-    <button onclick="insertMixedFraction()">帯分数</button>
-    <button onclick="insertFraction()">分数</button>
-    <button onclick="insertSymbol('(')">(</button>
-    <button onclick="insertSymbol(')')">)</button>
-    <br>
-    <button onclick="submitAnswer()">✔ 決定</button>
-  </div>
-
+  
   <script>
-    const mathField = document.getElementById("math-field");
+    const mathField = document.getElementById('mathfield');
+    // 帯分数入力中かどうかを判定するフラグ
+    let inMixedFractionMode = false;
 
-    function insertSymbol(symbol) {
-      mathField.insert(symbol);
+    function insertDigit(digit) {
+      mathField.executeCommand('insert', digit);
     }
-
+    
+    // ÷ボタンの動作：
+    function handleDivision() {
+      if(inMixedFractionMode==1){
+        mathField.executeCommand('moveToNextPlaceholder');
+      }else{
+        let latex = mathField.getValue('latex');
+        if(latex==""){
+          mathField.executeCommand('insert', `\\frac{\\placeholder}`);
+        }else{
+          let match = latex.match(/(\d+(\.\d+)?)$/);
+  
+          // 分母に \placeholder() を入れて分子部分には取得した数字を利用
+          mathField.setValue('');
+          mathField.executeCommand('insert', `\\frac{${match[1]}}{\\placeholder}`);
+          // カーソルを分母のプレースホルダーへ移動
+          mathField.executeCommand('moveToNextPlaceholder');
+        }
+      }
+    }
+    
+    // 帯分数ボタンの動作：
+    // 既に入力済みの整数部分はそのままに、分数部分の空テンプレートを追加
     function insertMixedFraction() {
-      mathField.insert("\\text{帯分数:}\\, {}+\\frac{}{}");
+        let latex = mathField.getValue('latex');
+        if(latex==""){
+          console.log("aa")
+          mathField.executeCommand('insert', `\\placeholder+\\frac{\\placeholder}{\\placeholder}`);
+        }else{
+          inMixedFractionMode=1
+          let latex = mathField.getValue('latex');
+          mathField.executeCommand('insert', `\\frac{\\placeholder}{\\placeholder}`);
+        }
     }
-
-    function insertFraction() {
-      mathField.insert("\\frac{}{}");
+    
+    // フィールドをクリア
+    function clearField() {
+      mathField.setValue('');
+      inMixedFractionMode = false;
     }
-
-    function deleteLast() {
-      mathField.executeCommand('deletePreviousChar');
-    }
-
-    function submitAnswer() {
-      alert("入力された数式: " + mathField.getValue("latex"));
+    
+    // 決定ボタン：MathFieldの内容をLaTeX形式に変換してアラートで表示
+    function commitInput() {
+      const latexOutput = mathField.getValue('latex');
+      alert("LaTeX出力:\n" + latexOutput);
     }
   </script>
 </body>
