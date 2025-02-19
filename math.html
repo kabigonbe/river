@@ -2,31 +2,117 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/mathlive"></script>
-  <title>カスタムキーボード</title>
+  <title>カスタムキーボード付き数式入力</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      margin: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    /* 数式表示エリア */
+    .output-container {
+      margin: 20px;
+    }
+    math-field {
+      font-size: 24px;
+      min-width: 300px;
+      height: 100px;
+      border: 2px solid #007BFF;
+      border-radius: 5px;
+      background: white;
+      padding: 10px;
+    }
+    /* キーボードボタン */
+    .keyboard {
+      margin-top: 20px;
+    }
+    .keyboard button {
+      font-size: 18px;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #eee;
+      width: 60px;
+      height: 50px;
+    }
+    .keyboard button:hover {
+      background: #ddd;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+    .enter-btn {
+      background: #28a745;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-  <h2>カスタムキーボード付き MathLive</h2>
+  <h2>カスタムキーボード付き 数式入力</h2>
 
-  <!-- MathLiveの数式入力フィールド -->
-  <math-field id="math-input" virtual-keyboard-mode="manual"></math-field>
+  <div>
+    <math-field id="math-field"></math-field>
+  </div>
+
+  <div>
+    <button onclick="insertSymbol('1')">1</button>
+    <button onclick="insertSymbol('2')">2</button>
+    <button onclick="insertSymbol('3')">3</button>
+    <button onclick="insertSymbol('+')">＋</button>
+    <button onclick="insertSymbol('-')">−</button>
+    <br>
+    <button onclick="insertSymbol('4')">4</button>
+    <button onclick="insertSymbol('5')">5</button>
+    <button onclick="insertSymbol('6')">6</button>
+    <button onclick="insertSymbol('\\times')">×</button>
+    <button onclick="insertSymbol('\\div')">÷</button>
+    <br>
+    <button onclick="insertSymbol('7')">7</button>
+    <button onclick="insertSymbol('8')">8</button>
+    <button onclick="insertSymbol('9')">9</button>
+    <button onclick="insertSymbol('=')">＝</button>
+    <button onclick="deleteLast()">⌫</button>
+    <br>
+    <button onclick="insertSymbol('0')">0</button>
+    <button onclick="insertMixedFraction()">帯分数</button>
+    <button onclick="insertFraction()">分数</button>
+    <button onclick="insertSymbol('(')">(</button>
+    <button onclick="insertSymbol(')')">)</button>
+    <br>
+    <button onclick="submitAnswer()">✔ 決定</button>
+  </div>
 
   <script>
-    MathLive.setKeyboardLayout("custom", {
-      "label": "カスタム",
-      "rows": [
-        [
-          { "label": "帯分数", "insert": "{}\\frac{}{}" },
-          { "label": "+", "insert": "+" },
-          { "label": "-", "insert": "-" },
-          { "label": "×", "insert": "\\times" },
-          { "label": "÷", "insert": "\\div" }
-        ]
-      ]
-    });
+    const mathField = document.getElementById("math-field");
 
-    const mathField = document.getElementById("math-input");
-    mathField.setOptions({ virtualKeyboardLayout: "custom" });
+    function insertSymbol(symbol) {
+      mathField.insert(symbol);
+    }
+
+    function insertMixedFraction() {
+      mathField.insert("\\text{帯分数:}\\, {}+\\frac{}{}");
+    }
+
+    function insertFraction() {
+      mathField.insert("\\frac{}{}");
+    }
+
+    function deleteLast() {
+      mathField.executeCommand('deletePreviousChar');
+    }
+
+    function submitAnswer() {
+      alert("入力された数式: " + mathField.getValue("latex"));
+    }
   </script>
 </body>
 </html>
