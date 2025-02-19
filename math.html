@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://unpkg.com/mathlive"></script>
+  <title>カスタムキーボード</title>
+</head>
+<body>
+  <h2>カスタムキーボード付き MathLive</h2>
+
+  <!-- MathLiveの数式入力フィールド -->
+  <math-field id="math-input" virtual-keyboard-mode="manual"></math-field>
+
+  <script>
+    MathLive.setKeyboardLayout("custom", {
+      "label": "カスタム",
+      "rows": [
+        [
+          { "label": "帯分数", "insert": "{}\\frac{}{}" },
+          { "label": "+", "insert": "+" },
+          { "label": "-", "insert": "-" },
+          { "label": "×", "insert": "\\times" },
+          { "label": "÷", "insert": "\\div" }
+        ]
+      ]
+    });
+
+    const mathField = document.getElementById("math-input");
+    mathField.setOptions({ virtualKeyboardLayout: "custom" });
+  </script>
+</body>
+</html>
