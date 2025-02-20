@@ -1,0 +1,10 @@
+{
+  "分数": [
+    {
+      "index": 1,
+      "問題文": "$$ 3+\frac12+\frac34= \fcolorbox{black}{white}{    }$$",
+      "解答": "3\frac54",
+      "解説": "null"
+    }
+ ]
+}

@@ -98,8 +98,7 @@ math-field::part(virtual-keyboard-toggle) {
     function insertMixedFraction() {
         let latex = mathField.getValue('latex');
         if(latex==""){
-          console.log("aa")
-          mathField.executeCommand('insert', `\\placeholder+\\frac{\\placeholder}{\\placeholder}`);
+          mathField.executeCommand('insert', `\\placeholder+\\frac{\\placeholder}{}`);
         }else{
           inMixedFractionMode=1
           let latex = mathField.getValue('latex');
