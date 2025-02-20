@@ -2,9 +2,9 @@
   "分数": [
     {
       "index": 1,
-      "問題文": "次の\(\fcolorbox{black}{white}{    }\)を求めましょう。",
-      "数式": "\( 3+\frac12+\frac34= \fcolorbox{black}{white}{    } \)",
-      "解答": "\( 3+\frac54 \)",
+      "問題文": "次の\\( \\fcolorbox{black}{white}{    } \\)を求めましょう。",
+      "数式": "\\( 3+\\frac12+\\frac34= \\fcolorbox{black}{white}{    } \\)",
+      "解答": "\\( 3+\\frac54 \\)",
       "解説": "なし",
       "type": "足し算"
     }
