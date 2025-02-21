@@ -65,7 +65,7 @@
     #quiz-container {
       font-size: 24px;
       width: 600px;
-      min-height:60px;
+      min-height:400px;
       text-align: left;
       margin: 1px;
       background: white;
@@ -76,6 +76,7 @@
 
     .question-container {
       position:relative;
+      min-height:400px;
       font-size: 24px;
       margin-bottom: 20px;
       padding: 15px;
@@ -121,9 +122,9 @@
     .incorrect-mark::after {
         content: "";
         position: absolute;
-        width: 100%; /* 線の長さ */
+        width: 250px; /* 線の長さ */
         height: 20px; /* 線の太さ */
-        background-color: red;
+        background-color: white;
         top: 50%;
         left: 0;
         transform-origin: center;
@@ -199,7 +200,7 @@
 
     #mathfield {
       font-size:24px;
-      width: 400px;
+      width: 600px;
       height:80px;
       display: flex;
       vertical-align: middle;
@@ -208,21 +209,21 @@
       background: white;
       padding: 5px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
 
     }
 
 
     .keyboard { margin-top: 10px; }
     .key {
-      font-size: 18px;
+      font-size: 36px;
       display: inline-block;
-      width: 60px;
-      height: 40px;
-      line-height: 40px;
+      width: 144px;
+      height: 80px;
+      line-height:70px;
       text-align: center;
-      border: 1px solid #ccc;
-      margin: 3px;
+      border: 2px solid #ccc;
+      margin: 1px;
       border-radius: 5px;
       cursor: pointer;
       background-color: #f9f9f9;
@@ -559,7 +560,7 @@
     <!-- 数字キー -->
     <div class="key" onclick="handleDivision()">分数</div>
     <div class="key" onclick="insertMixedFraction()">帯分数</div>
-    <div class="key" style="width:133px"  onclick="clearField()">クリア</div>
+    <div class="key" style="width:298px"  onclick="clearField()">クリア</div>
     <br>
     <div class="key" onclick="insertDigit('7')">7</div>
     <div class="key" onclick="insertDigit('8')">8</div>
@@ -578,8 +579,8 @@
     <div class="key" onclick="mathField.executeCommand('moveToPreviousChar')">🔙</div>
     <br>
     <div class="key" onclick="insertDigit('0')">0</div>
-    <div class="key" onclick="insertDigit('.')">.</div>
-    <div class="key" style="width:133px; font-weight:bold;" onclick="checkAnswer()">決定</div>
+    <div class="key" style="font-weight:bold;"onclick="insertDigit('.')">.</div>
+    <div class="key" style="width:298px; font-weight:bold;" onclick="checkAnswer()">決定</div>
   </div>
 <script type="text/javascript" src="./math/inputForm.js"></script>
 <!--
