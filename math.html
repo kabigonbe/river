@@ -257,6 +257,8 @@
       line-height:7px;
     }
     #footer {
+      position:fixed;
+      bottom:0;
       width: 100%;
       height:50px;
       background: #333;
@@ -575,10 +577,6 @@
 
   <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
   
-<div id="footer">
-  <p>Copyright ©oji40san. All Rights Reserved.</p>
-</div>
- 
   <!-- カスタムキーボード（数字、.、÷、帯分数、クリア、決定） -->
   <table class="keyboard">
     <tr>
@@ -610,22 +608,9 @@
       <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
     </tr>
   </table>
-<script type="text/javascript" src="./math/inputForm.js"></script>
 <div id="footer">
   <p>Copyright ©oji40san. All Rights Reserved.</p>
 </div>
-<!--
-<p>分数の例: \( \frac{a}{b} \)</p>
-<p>\( 3\frac54 \)</p>
-<p>\( 3+\frac12+\frac34= \fcolorbox{black}{white}{\phantom{a}} \)</p>
-<p>\( 3+\frac12+\frac34= \fbox{\phantom{00}} \)</p>
-<p>\( 3+\frac12+\frac34= \Box \)</p>
-<p>\( \left(3+\frac12+\frac34\right)= \square \)</p>
-<div id="hiddenRender">
-  <math id="renderCorrect"></math>
-  <br>
-  <math id="renderUser"></math>
-</div>
--->
+<script type="text/javascript" src="./math/inputForm.js"></script>
 </body>
 </html>
