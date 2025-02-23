@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>分数・帯分数入力キーボード（小数対応・決定ボタン付き）</title>
+  <title>おじさん式計算ドリル</title>
   <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -53,7 +53,8 @@
 
     /* クイズのコンテナ */
     #quiz-container {
-//      flex-grow: 1;
+      flex-grow: 1;
+      display:flex;
       width: 100h-5px;
       font-size: 24px;
 //      min-height:400px;
@@ -65,12 +66,11 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .question-container {
+    .qArea {
       width: 100%;
       height:100%;
       overflow-y: auto;
       position:relative;
-      font-size: 24px;
       margin-bottom: 5px;
       padding: 15px;
       border: 2px solid #ddd;
@@ -79,14 +79,62 @@
       transition: 0.3s;
       box-sizing: border-box;
     }
+    .qArea:hover {
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
 
-    .question-text {
-      font-size:24px;
+    .qIndex {
+      font-size:18px;
+      font-weight: bold;
+      margin-bottom: 1px;
+    }
+
+    .qText {
+      font-size:18px;
       font-weight: bold;
     }
 
-    .question-container:hover {
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    .qForm {
+      font-size:18px;
+      font-weight: bold;
+    }
+
+    .answer-container {
+        margin-top: 10px;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .user-answer {
+        font-size: 18px;
+    }
+    
+    .correct-answer {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .explanation {
+        font-size: 16px;
+        color: #555;
+        background: #f9f9f9;
+        padding: 8px;
+        border-radius: 5px;
+    }
+
+    .next-button {
+        margin-top: 15px;
+        padding: 10px 15px;
+        font-size: 18px;
+        border: none;
+        background: #007BFF;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .next-button:hover {
+        background: #0056b3;
     }
 
     .correct-mark::before {
@@ -384,18 +432,31 @@
                                  解説:question.解説,
                                  type:question.type};
 
+        // 問題エリア作成
         const questionDiv = document.createElement("div");
-        questionDiv.classList.add("question-container");
+        questionDiv.classList.add("qArea");
         questionDiv.setAttribute("id", `question-${index}`);
 
+        // 問題番号
+        const questionIndex = document.createElement("p");
+        questionIndex.textContent = `問題 ${index + 1}`;
+        questionIndex.classList.add("qIndex");
+
+        // 問題文
         const questionText = document.createElement("p");
         questionText.textContent = question.問題文;
-        questionText.classList.add("question-text");
-        questionDiv.appendChild(questionText);
+        questionText.classList.add("qText");
 
+        // 数式 (MathJax 用)
         const questionForm = document.createElement("p");
-        questionForm.textContent = question.数式;
+        questionForm.innerHTML = question.数式
+        questionForm.classList.add("qFormula");
+
+        questionDiv.appendChild(questionIndex);
+        questionDiv.appendChild(questionText);
         questionDiv.appendChild(questionForm);
+
+        // コンテナに追加
         quizContainer.appendChild(questionDiv);
       });
       MathJax.typesetPromise();
@@ -442,43 +503,49 @@
       console.log("正しい答え"+correctMathML)
       console.log("入力した答え"+userMathML)
       // 正規化して比較
+
       const questionDiv = document.getElementById(`question-${0}`);
-      if (normalizeMathML(correctMathML) === normalizeMathML(userMathML)) {
-          questionDiv.style.backgroundColor = "#d4edda"; 
-          showCorrectMark(0);
-          const correctMark = document.createElement("div");
-          correctMark.classList.add("correct-mark");
-          questionDiv.appendChild(correctMark);
-      } else {
-          questionDiv.style.backgroundColor = "#f8d7da"; 
-          showCorrectMark(0);
-          const correctMark = document.createElement("div");
-          correctMark.classList.add("incorrect-mark");
-          questionDiv.appendChild(correctMark);
+      // 以前の正誤マーク・解答エリアを削除
+      showCorrectMark(0);
+      let existingAnswer = questionDiv.querySelector(".answer-container");
+      if (existingAnswer) {
+          existingAnswer.remove();
       }
 
-      if (!questionDiv.querySelector(".answer-container")) {
-        const answerContainer = document.createElement("div");
-        answerContainer.classList.add("answer-container");
+      // 正解判定
+      let isCorrect = normalizeMathML(correctMathML) === normalizeMathML(userMathML);
+      questionDiv.style.backgroundColor = isCorrect ? "#d4edda" : "#f8d7da";
 
-        // 解答の表示
-        const inputText = document.createElement("p");
-        inputText.innerHTML = `<strong>あなたの回答:</strong> ${userTex}`;
-        answerContainer.appendChild(inputText);
 
-        // 解答の表示
-        const answerText = document.createElement("p");
-        answerText.innerHTML = `<strong>正解:</strong> ${correctTex}`;
-        answerContainer.appendChild(answerText);
+      // 正誤マークを追加
+      const mark = document.createElement("div");
+      mark.classList.add(isCorrect ? "correct-mark" : "incorrect-mark");
+      questionDiv.appendChild(mark);
 
-        // 解説の表示
-        const explanationText = document.createElement("p");
-        explanationText.innerHTML = `<strong>解説:</strong> ${correctAnswers[0]["解説"]}`;
-        answerContainer.appendChild(explanationText);
+      // 解答エリアを作成
+      const answerContainer = document.createElement("div");
+      answerContainer.classList.add("answer-container");
 
-        questionDiv.appendChild(answerContainer);
-        MathJax.typesetPromise();
-      }
+      // ユーザーの回答
+      const inputText = document.createElement("p");
+      inputText.classList.add("user-answer");
+      inputText.innerHTML = `<strong>あなたの回答:</strong> ${userTex}`;
+      answerContainer.appendChild(inputText);
+
+      // 正解の表示
+      const answerText = document.createElement("p");
+      answerText.classList.add("correct-answer");
+      answerText.innerHTML = `<strong>正解:</strong> ${correctTex}`;
+      answerContainer.appendChild(answerText);
+
+      // 解説
+      const explanationText = document.createElement("p");
+      explanationText.classList.add("explanation");
+      explanationText.innerHTML = `<strong>解説:</strong> ${correctAnswers[0]["解説"]}`;
+      answerContainer.appendChild(explanationText);
+
+      questionDiv.appendChild(answerContainer);
+      MathJax.typesetPromise();
     });
   }
 
