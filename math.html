@@ -64,6 +64,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       height: 640px; /* キーボードと余白を考慮 */
+      min-height:calc(100px);
       max-height:calc(100dvh - 640px);
     }
 
@@ -93,6 +94,8 @@
     .qText {
       font-size:24px;
       font-weight: bold;
+      position:relative;
+      z-index:3;
     }
 
     .qForm {
@@ -101,55 +104,56 @@
     }
 
     .answer-container {
-        margin-top: 10px;
-        padding: 10px;
-        border-top: 1px solid #ddd;
+      margin-top: 14px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
     }
     
     .user-answer {
-        font-size: 24px;
+      font-size: 24px;
     }
     
     .correct-answer {
-        font-size: 24px;
-        font-weight: bold;
+      font-size: 24px;
+      font-weight: bold;
     }
     
     .explanation {
-        font-size: 16px;
-        color: #555;
-        background: #f9f9f9;
-        padding: 8px;
-        border-radius: 5px;
+      font-size: 16px;
+      color: #555;
+      background: #f9f9f9;
+      padding: 8px;
+      border-radius: 5px;
     }
 
     .next-button {
-        margin-top: 15px;
-        padding: 10px 15px;
-        font-size: 24px;
-        border: none;
-        background: #007BFF;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
+      margin-top: 15px;
+      padding: 10px 15px;
+      font-size: 24px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
     }
     
     .next-button:hover {
-        background: #0056b3;
+      background: #0056b3;
     }
 
     .correct-mark::before {
-        aspect-ratio:1 / 1;
-        content:"";
-        position: absolute;
-        top: 20%;
-        left:50%;
-        width: 200px;
-        height:200px;
-        border: 20px solid white;
-        border-radius: 50%;
-        transform: translate(0%,0%);
-        background-color: transparent;
+      aspect-ratio:1 / 1;
+      content:"";
+      position: absolute;
+      top: 20%;
+      left:50%;
+      width: 200px;
+      height:200px;
+      border: 20px solid white;
+      border-radius: 50%;
+      transform: translate(0%,0%);
+      background-color: transparent;
+      z-index:1;
     }
 
     .incorrect-mark {
@@ -159,6 +163,7 @@
         width: 200px;  /* サイズ */
         height: 200px;
         transform: translate(0%, 0%);
+      z-index:1;
     }
     
     .incorrect-mark::before,
@@ -194,7 +199,7 @@
     /* テーブルのスタイル */
     table {
       font-size: 20px;
-      width: 97%;
+      width: 100h-5;
       margin: 1px;
       border-collapse: collapse;
       background: white;
@@ -326,7 +331,11 @@
     let answeredQuestions = new Set();
     let totalScore = 0;
     let startTime = Date.now();
+    let isCorrect;
+
+    let currentQuestionIndex = 0;
     let incorrectAnswers = [];
+    const maxQuestions = 10;
 
     // JSONデータを取得する関数
     async function loadJson() {
@@ -422,56 +431,69 @@
 
 
     function createQuiz() {
+      const index = currentQuestionIndex;
       const quizContainer = document.getElementById("quiz-container");
       quizContainer.innerHTML = "";
+      console.log(index)
+      if (currentQuestionIndex >= questions.length) {
+          showIncorrectSummary();
+          return;
+      }
 
-      questions.forEach((question, index) => {
-        if(index!==0) return;
-        correctAnswers[index] = {問題文:question.問題文,
-                                 数式:question.数式,
-                                 解答:question.解答,
-                                 解説:question.解説,
-                                 type:question.type};
+      const question = questions[index];
+      correctAnswers[index] = {
+          index: question.index,
+          問題文: question.問題文,
+          数式: question.数式,
+          解答: question.解答,
+          解説: question.解説,
+          type: question.type
+      };
 
-        // 問題エリア作成
-        const questionDiv = document.createElement("div");
-        questionDiv.classList.add("qArea");
-        questionDiv.setAttribute("id", `question-${index}`);
+      // 問題エリア作成
+      const questionDiv = document.createElement("div");
+      questionDiv.classList.add("qArea");
+      questionDiv.setAttribute("id", `question`);
 
-        // 問題番号
-        const questionIndex = document.createElement("p");
-        questionIndex.textContent = `問題 ${index + 1}`;
-        questionIndex.classList.add("qIndex");
+      // 問題番号
+      const questionIndex = document.createElement("p");
+      questionIndex.textContent = `問題 ${index + 1}`;
+      questionIndex.classList.add("qIndex");
 
-        // 問題文
-        const questionText = document.createElement("p");
-        questionText.textContent = question.問題文;
-        questionText.classList.add("qText");
+      // 問題文
+      const questionText = document.createElement("p");
+      questionText.textContent = question.問題文;
+      questionText.classList.add("qText");
 
-        // 数式 (MathJax 用)
-        const questionForm = document.createElement("p");
-        questionForm.innerHTML = question.数式
-        questionForm.classList.add("qFormula");
+      // 数式 (MathJax 用)
+      const questionForm = document.createElement("p");
+      questionForm.innerHTML = question.数式
+      questionForm.classList.add("qFormula");
 
-        questionDiv.appendChild(questionIndex);
-        questionDiv.appendChild(questionText);
-        questionDiv.appendChild(questionForm);
+      questionDiv.appendChild(questionIndex);
+      questionDiv.appendChild(questionText);
+      questionDiv.appendChild(questionForm);
 
-        // コンテナに追加
-        quizContainer.appendChild(questionDiv);
-      });
+      // コンテナに追加
+      quizContainer.appendChild(questionDiv);
       MathJax.typesetPromise();
     }
 
   function normalizeMathML(mathml) {
       return mathml
-          .replace(/\s+/g, '') // 余分な空白を削除
-          .replace(/<mstyle[^>]*>/g, '').replace(/<\/mstyle>/g, '') // <mstyle> を削除
-          .replace(/<mrow[^>]*><\/mrow>/g, ''); // 空の <mrow> を削除
+        .replace(/\s+/g, '') // 余分な空白を削除
+        .replace(/<mtext[^>]*>.*?<\/mtext>/g, '') // <mtext> の削除（MathJax の \( \) など）
+        .replace(/<mstyle[^>]*>/g, '').replace(/<\/mstyle>/g, '') // <mstyle> の削除
+        .replace(/<mrow[^>]*>/g, '').replace(/<\/mrow>/g, '') // <mrow> の削除（data-mjx-texclass含む）
+        .replace(/mathcolor="[^"]*"/g, '') // MathJax が追加する余計な属性を削除
+        .replace(/display="block"/g, '') // MathJax の display 属性を削除
+        .replace(/math xmlns="[^"]*"/g, 'math') // xmlns 属性を統一
+        .replace(/<\/?math>/g, ''); // <math> タグの削除（比較のため）
   }
 
-  function showCorrectMark(questionIndex) {
-      const questionDiv = document.getElementById(`question-${questionIndex}`);
+
+  function showCorrectMark() {
+      const questionDiv = document.getElementById(`question`);
   
       // 既に「〇」がある場合は削除
       let existingMark = questionDiv.querySelector(".correct-mark");
@@ -485,16 +507,11 @@
   }
 
   function checkAnswer() {
-    const correctTex = correctAnswers[0]["解答"];
+    const correctTex = correctAnswers[currentQuestionIndex]["解答"];
     const mathField = document.getElementById("mathfield");
     const userTex = "\\("+mathField.getValue()+"\\)";
 
     // MathJax に数式を MathML としてレンダリング
-//    document.getElementById("renderUser").innerHTML = `\\(${userTex}\\)`;
-//    document.getElementById("renderCorrect").innerHTML = `${correctTex}`;
-
-    
-
     MathJax.typesetPromise().then(() => {
       // MathML の内部構造を取得
 //      const correctMathML = document.getElementById("renderCorrect").querySelector("math").outerHTML;
@@ -505,23 +522,32 @@
       console.log("入力した答え"+userMathML)
       // 正規化して比較
 
-      const questionDiv = document.getElementById(`question-${0}`);
+      const questionDiv = document.getElementById(`question`);
       // 以前の正誤マーク・解答エリアを削除
-      showCorrectMark(0);
+      showCorrectMark();
+
       let existingAnswer = questionDiv.querySelector(".answer-container");
       if (existingAnswer) {
           existingAnswer.remove();
       }
 
       // 正解判定
-      let isCorrect = normalizeMathML(correctMathML) === normalizeMathML(userMathML);
-      questionDiv.style.backgroundColor = isCorrect ? "#d4edda" : "#f8d7da";
+      console.log("正しい答え"+normalizeMathML(correctMathML))
+      console.log("入力した答え"+normalizeMathML(userMathML))
 
+      
+      if(normalizeMathML(correctMathML) === normalizeMathML(userMathML)){
+        questionDiv.style.backgroundColor = "#d4edda";
+        isCorrect = 1;
+      }else{
+        questionDiv.style.backgroundColor = "#f8d7da";
+        isCorrect = 0;
+      }
 
       // 正誤マークを追加
       const mark = document.createElement("div");
       mark.classList.add(isCorrect ? "correct-mark" : "incorrect-mark");
-      questionDiv.appendChild(mark);
+      questionDiv.insertBefore(mark, questionDiv.firstChild);
 
       // 解答エリアを作成
       const answerContainer = document.createElement("div");
@@ -542,21 +568,41 @@
       // 解説
       const explanationText = document.createElement("p");
       explanationText.classList.add("explanation");
-      explanationText.innerHTML = `<strong>解説:</strong> ${correctAnswers[0]["解説"]}`;
+      explanationText.innerHTML = `<strong>解説:</strong> ${correctAnswers[currentQuestionIndex]["解説"]}`;
       answerContainer.appendChild(explanationText);
 
       questionDiv.appendChild(answerContainer);
       MathJax.typesetPromise();
+
+      const nextButton = document.createElement("button");
+      nextButton.textContent = "次の問題へ";
+      nextButton.classList.add("next-button");
+      nextButton.onclick = nextQuestion;
+      answerContainer.appendChild(nextButton);
     });
   }
 
-    function updateElapsedTime() {
-      if (answeredQuestions.size < questions.length) {
-        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-        document.getElementById("elapsed-time").textContent = elapsedTime;
-        setTimeout(updateElapsedTime, 1000);
+  function nextQuestion() {
+      document.getElementById("mathfield").setValue("");
+      if(isCorrect){
+        totalScore++;
+        document.getElementById("total-score").textContent = totalScore;
       }
+      if (currentQuestionIndex < maxQuestions - 1) {
+          currentQuestionIndex++;
+          createQuiz();
+      } else {
+          showIncorrectSummary();
+      }
+  }
+
+  function updateElapsedTime() {
+    if (answeredQuestions.size < questions.length) {
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById("elapsed-time").textContent = elapsedTime;
+      setTimeout(updateElapsedTime, 1000);
     }
+  }
 //
 //    function endQuiz() {
 //      updateElapsedTime();
