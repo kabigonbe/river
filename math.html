@@ -63,7 +63,6 @@
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      height: calc(100dvh - 800px); /* キーボードと余白を考慮 */
     }
 
     .qArea {
@@ -674,6 +673,11 @@
       <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
     </tr>
       <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
+    </tr>
+    <tr>
+      <td class="key" onclick="insertDigit('0')">0</td>
+      <td class="key" onclick="insertDigit('.')">.</td>
+      <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
     </tr>
   </table>
 <script type="text/javascript" src="./math/inputForm.js"></script>
