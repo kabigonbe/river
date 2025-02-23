@@ -53,8 +53,8 @@
 
     /* クイズのコンテナ */
     #quiz-container {
-      flex-grow: 1;
-      display:flex;
+/*      flex-grow: 1;
+      display:flex;*/
       width: 100h-5px;
       font-size: 24px;
       text-align: left;
@@ -63,7 +63,8 @@
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      height: calc(100dvh - 430px); /* キーボードと余白を考慮 */
+      height: 640px; /* キーボードと余白を考慮 */
+      max-height:calc(100dvh - 640px);
     }
 
     .qArea {
@@ -641,6 +642,8 @@
     <span id="qform"></span>
   </div>
 
+  <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
+  
   <table class="keyboard">
     <tr>
       <td class="key" onclick="handleDivision()">分数</td>
@@ -673,9 +676,6 @@
       <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
     </tr>
   </table>
-
-  <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
-
 <script type="text/javascript" src="./math/inputForm.js"></script>
 </body>
 </html>
