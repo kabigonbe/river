@@ -9,7 +9,7 @@
   // ÷ボタンの動作：
   function handleDivision() {
     if(inMixedFractionMode==1){
-      mathField.executeCommand('moveToNextPlaceholder');
+      mathField.executeCommand('moveToNextChar');
     }else{
       let latex = mathField.getValue('latex');
       if(latex==""){
@@ -17,11 +17,12 @@
       }else{
         let match = latex.match(/(\d+(\.\d+)?)$/);
 
-        // 分母に \placeholder() を入れて分子部分には取得した数字を利用
-        mathField.setValue('');
-        mathField.executeCommand('insert', `\\dfrac{${match[1]}}{\\placeholder{}}`);
-        // カーソルを分母のプレースホルダーへ移動
-        mathField.executeCommand('moveToNextPlaceholder');
+        if (match) {
+          mathField.setValue('');
+          mathField.executeCommand('insert', `\\dfrac{${match[1]}}{\\placeholder{}}`);
+        } else {
+          mathField.executeCommand('insert', `\\dfrac{\\placeholder{}}{\\placeholder{}}`);
+        }
       }
     }
   }

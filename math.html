@@ -120,7 +120,7 @@
     }
     
     .explanation {
-      font-size: 16px;
+      font-size: 18px;
       color: #555;
       background: #f9f9f9;
       padding: 8px;
@@ -325,14 +325,19 @@
       height: 100px;
       display: flex;
       border-radius: 10px;
-      box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
-      touch-action: manipulation;
     }
     
     /* MathLive の内部コンテンツを上下中央にする */
     #mathfield::part(container) {
       height: 100%;
     }
+    math-field::part(menu-toggle) {
+      display: none;
+    }
+    math-field::part(virtual-keyboard-toggle) {
+      display: none;
+    }
+
 
     .keyboard {
       width: 100%;
@@ -366,20 +371,6 @@
       text-align: center;
       padding: 10px 0;
       font-size: 24px;
-    }
-
-    math-field::part(menu-toggle) {
-      display: none;
-    }
-    math-field::part(virtual-keyboard-toggle) {
-      display: none;
-    }
-    math-field::part(caret) {
-      border-left: 8px solid blue; /* カーソルを太く＆赤色に */
-      background-color: red;
-      width: 2px;
-      height: 1em;
-      opacity: 0.8;
     }
 
   </style>
@@ -783,7 +774,7 @@ function endQuiz() {
     <span id="qform"></span>
   </div>
 
-  <math-field id="mathfield" virtual-keyboard-mode="off"></math-field>
+  <math-field id="mathfield" virtual-keyboard-mode="off" readonly></math-field>
   
   <table class="keyboard" id="keyboard">
     <tr>
