@@ -55,7 +55,7 @@
     #quiz-container {
 /*      flex-grow: 1;
       display:flex;*/
-      width: 100h-5px;
+      width: calc(100% - 5px);
       font-size: 24px;
       text-align: left;
       margin: 1px;
@@ -119,7 +119,7 @@
     }
     
     .explanation {
-      font-size: 16px;
+      font-size: 24px;
       color: #555;
       background: #f9f9f9;
       padding: 8px;
@@ -199,7 +199,7 @@
     /* テーブルのスタイル */
     table {
       font-size: 20px;
-      width: 100h-5;
+      width:100%;
       margin: 1px;
       border-collapse: collapse;
       background: white;
@@ -223,13 +223,65 @@
       background: #f9f9f9;
     }
 
-    /* フッター */
+    #result-container {
+      width: 100%;
+      overflow-y: auto;*/
+    }
+
+    /* テーブルのスタイル */
+    .result-table {
+      width: calc(100% - 10px);
+      font-size: 20px;
+      margin: 1px;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      table-layout:fixed;
+    }
+
+    .result-table th,
+    .result-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      overflow:hidden;
+    }
+
+    .result-table th {
+      width:100px;
+      background:gray;
+      color: white;
+    }
+
+    .result-table td {
+      background: #f9f9f9;
+    }
+
     #final-message {
       font-size: 30px;
       font-weight: bold;
       margin-top: 20px;
       color: red;
     }
+
+    #final-score{
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: blue;
+    }
+
+    #final-elapsed-time{
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: blue;
+    }
+
     #total-score {
       font-size: 24px;
       font-weight: bold;
@@ -259,9 +311,16 @@
       color: white;
     }
 
+    #retry-button:disabled {
+        background: #ccc;      /* グレー背景 */
+        color: #666;           /* 文字色も薄くする */
+        cursor: not-allowed;   /* カーソルを「禁止マーク」にする */
+        border: 1px solid #aaa; /* 境界線を少し目立たせる */
+    }
+
     #mathfield {
       font-size:36px;
-      width: 100h-5px;
+      width: calc(100% - 5px);
       height:120px;
       display: flex;
       vertical-align: middle;
@@ -274,7 +333,7 @@
 
     }
 
-    #keyboard {
+    .keyboard {
       width: 100%;
       height:260px;
       border-collapse: separate;
@@ -336,6 +395,7 @@
 
     let currentQuestionIndex = 0;
     let incorrectAnswers = [];
+    let resultAnswers = [];
     const maxQuestions = 10;
 
     // JSONデータを取得する関数
@@ -343,7 +403,7 @@
       try {
         const response = await fetch('https://kabigonbe.github.io/river/jsons/question.json');
         allQuestions = await response.json(); // ここで questions にデータを格納
-        console.log(allQuestions)
+//        console.log(allQuestions)
 
         const $categorySelect = document.getElementById("category-select");
 
@@ -424,7 +484,6 @@
       questions = selectedQuestions;
 
       document.getElementById("total-questions").textContent = questions.length;
-      incorrectAnswers = [];
       init();
       createQuiz();
       updateElapsedTime();
@@ -435,9 +494,9 @@
       const index = currentQuestionIndex;
       const quizContainer = document.getElementById("quiz-container");
       quizContainer.innerHTML = "";
-      console.log(index)
+//      console.log(index)
       if (currentQuestionIndex >= questions.length) {
-          showIncorrectSummary();
+          endQuiz();
           return;
       }
 
@@ -447,8 +506,10 @@
           問題文: question.問題文,
           数式: question.数式,
           解答: question.解答,
-          解説: question.解説,
-          type: question.type
+          解説: question.解説.replace("。","<br>"),
+          type: question.type,
+          correct:null,
+          回答: null
       };
 
       // 問題エリア作成
@@ -519,8 +580,8 @@
 //      const userMathML = document.getElementById("renderUser").querySelector("math").outerHTML;
       const correctMathML = MathJax.tex2mml(correctTex);
       const userMathML = MathJax.tex2mml(userTex);
-      console.log("正しい答え"+correctMathML)
-      console.log("入力した答え"+userMathML)
+//      console.log("正しい答え"+correctMathML)
+//      console.log("入力した答え"+userMathML)
       // 正規化して比較
 
       const questionDiv = document.getElementById(`question`);
@@ -533,21 +594,23 @@
       }
 
       // 正解判定
-      console.log("正しい答え"+normalizeMathML(correctMathML))
-      console.log("入力した答え"+normalizeMathML(userMathML))
+//      console.log("正しい答え"+normalizeMathML(correctMathML))
+//      console.log("入力した答え"+normalizeMathML(userMathML))
 
       
+      const mark = document.createElement("div");
       if(normalizeMathML(correctMathML) === normalizeMathML(userMathML)){
         questionDiv.style.backgroundColor = "#d4edda";
+        mark.classList.add("correct-mark");
         isCorrect = 1;
+        correctAnswers[currentQuestionIndex]["correct"]="○"
       }else{
         questionDiv.style.backgroundColor = "#f8d7da";
+        mark.classList.add("incorrect-mark");
         isCorrect = 0;
+        correctAnswers[currentQuestionIndex]["correct"]="×"
+        incorrectAnswers.push(correctAnswers[currentQuestionIndex]);
       }
-
-      // 正誤マークを追加
-      const mark = document.createElement("div");
-      mark.classList.add(isCorrect ? "correct-mark" : "incorrect-mark");
       questionDiv.insertBefore(mark, questionDiv.firstChild);
 
       // 解答エリアを作成
@@ -559,6 +622,7 @@
       inputText.classList.add("user-answer");
       inputText.innerHTML = `<strong>あなたの回答:</strong> ${userTex}`;
       answerContainer.appendChild(inputText);
+      correctAnswers[currentQuestionIndex]["回答"]=userTex
 
       // 正解の表示
       const answerText = document.createElement("p");
@@ -569,7 +633,7 @@
       // 解説
       const explanationText = document.createElement("p");
       explanationText.classList.add("explanation");
-      explanationText.innerHTML = `<strong>解説:</strong> ${correctAnswers[currentQuestionIndex]["解説"]}`;
+      explanationText.innerHTML = `<strong>解説:</strong><br> ${correctAnswers[currentQuestionIndex]["解説"]}`;
       answerContainer.appendChild(explanationText);
 
       questionDiv.appendChild(answerContainer);
@@ -593,7 +657,7 @@
           currentQuestionIndex++;
           createQuiz();
       } else {
-          showIncorrectSummary();
+          endQuiz();
       }
   }
 
@@ -602,76 +666,104 @@
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById("elapsed-time").textContent = elapsedTime;
       setTimeout(updateElapsedTime, 1000);
+      return elapsedTime
     }
   }
-//
-//    function endQuiz() {
-//      updateElapsedTime();
-//
-//      if (totalScore === questions.length) {
-//          document.getElementById("final-message").textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
-//      } else {
-//          document.getElementById("final-message").textContent = `全問解答完了！お疲れ様でした🎉`;
-//      }
-//
-//      if (incorrectAnswers.length > 0) {
-//        let html = `<h2>間違った問題の正しい解答</h2>`;
-//        
-//        incorrectAnswers.forEach(q => {
-//            html += `
-//                <table>
-//                    <tr>
-//                        <th>慣用句</th>
-//                        <td><a href="https://www.google.com/search?q=${q.ans1}" target="_blank">${q.ans1}</td>
-//                    </tr>
-//                    <tr>
-//                        <th>例文</th>
-//                        <td>${q.問題文}</td>
-//                    </tr>
-//                    <tr>
-//                        <th>意味</th>
-//                        <td>${q.ans2}</td>
-//                    </tr>
-//                </table>
-//                <br>
-//            `;
-//        });
-//        document.getElementById("incorrect-answers").innerHTML = html;
-//        document.getElementById("retry-button").style.display = "block"; 
-//     }
-//	  document.getElementById("final-message").scrollIntoView({ behavior: "smooth", block: "start" });
-//    }
-//
-//    function scrollToNextQuestion(currentIndex) {
-//      const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
-//      if (nextQuestion) {
-//        nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
-//      }
-//    }
+
+function endQuiz() {
+    let elapsedTime = updateElapsedTime();
+
+    // クイズの内容を削除
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("keyboard").style.display = "none";
+    document.getElementById("mathfield").style.display = "none";
+    document.getElementById("elapsed-time-container").style.display = "none";
+//    document.querySelector(".controls").style.display = "none"; // カテゴリ選択部分も非表示
+
+    // 結果メッセージの表示
+    document.getElementById("result-container").style.display = "block";
+
+    let finalMessage = document.getElementById("final-message");
+    if (totalScore === questions.length) {
+        finalMessage.textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
+    } else {
+        finalMessage.textContent = `全問解答完了！お疲れ様でした🎉`;
+    }
+
+    // スコアの表示
+    let scoreMessage = document.getElementById("final-score");
+    scoreMessage.textContent = `スコア: ${totalScore} / ${questions.length}`;
+
+    // 時間の表示
+    let timeMessage = document.getElementById("final-elapsed-time");
+    timeMessage.textContent = `タイム: ${elapsedTime}秒`;
+
+    // 間違えた問題の表示
+    let incorrectContainer = document.getElementById("incorrect-answers");
+    if (!incorrectContainer) {
+        incorrectContainer = document.createElement("div");
+        incorrectContainer.id = "incorrect-answers";
+        document.body.appendChild(incorrectContainer);
+    }
+    incorrectContainer.innerHTML = ""; // 以前の内容をクリア
+    const retryButton = document.getElementById("retry-button");
+
+    if (incorrectAnswers.length > 0) {
+        let html = `<h2>間違った問題の正しい解答</h2>`;
+        incorrectAnswers.forEach(q => {
+            html += `
+                <table class="result-table">
+                    <tr><th>問題</th><td><p>${q.問題文}</p><p>${q.数式}</p></td></tr>
+                    <tr><th>正解</th><td>${q.解答}</td></tr>
+                    <tr><th>回答</th><td>${q.回答}</td></tr>
+                    <tr><th>解説</th><td>${q.解説 || "なし"}</td></tr>
+                </table><br>`;
+        });
+        incorrectContainer.innerHTML = html;
+        retryButton.disabled = false;
+    } else {
+//        incorrectContainer.innerHTML = `<p>全問正解でした！🎉</p>`;
+        retryButton.disabled = true;
+    }
+    
+    // 再挑戦ボタンの追加
+//    document.getElementById("quiz-container").style.display = "button";
+
+    // 結果表示部分へスクロール
+    finalMessage.scrollIntoView({ behavior: "smooth", block: "start" });
+    MathJax.typesetPromise();
+}
+
+    function scrollToNextQuestion(currentIndex) {
+      const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
+      if (nextQuestion) {
+        nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
 	function init(){
+    document.getElementById("quiz-container").style.display = "block";
+    document.getElementById("keyboard").style.display = "table";
+    document.getElementById("mathfield").style.display = "block";
+    document.getElementById("elapsed-time-container").style.display = "block";
+    document.querySelector(".controls").style.display = "block"; // カテゴリ選択部分も再表示
+    document.getElementById("result-container").style.display = "none";
+    resultAnswers = [];
     incorrectAnswers = []; // クリア
 		answeredQuestions.clear();
+    currentQuestionIndex=0;
 		totalScore=0;
 		startTime=Date.now();
     document.getElementById("total-score").textContent = totalScore;
     document.getElementById("total-questions").textContent = questions.length;
 //    document.getElementById("retry-button").style.display = "none"; // やり直しボタンを隠す
 	}
-//
-//    function retryIncorrect() {
-//        if (incorrectAnswers.length > 0) {
-//            filteredQuestions = incorrectAnswers; // 間違えた問題だけで新しいクイズを作成
-//            questions = filteredQuestions.map(q => ({
-//                問題文: q.問題文,
-//                解答1: q.ans1,
-//                解答2: q.ans2
-//            }));
-////            console.log(filteredQuestions)
-//			init();
-//            createQuiz(); // クイズを再生成
-//            document.getElementById("quiz-container").scrollIntoView({ behavior: "smooth", block: "start" });
-//        }
-//    }
+
+  function retryIncorrect() {
+    questions = incorrectAnswers;
+    init();
+    console.log(questions)
+    createQuiz();
+  }
 
     window.onload = loadJson;
 
@@ -691,7 +783,7 @@
 
   <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
   
-  <table class="keyboard">
+  <table class="keyboard" id="keyboard">
     <tr>
       <td class="key" onclick="handleDivision()">分数</td>
       <td class="key" onclick="insertMixedFraction()">帯分数</td>
@@ -719,10 +811,18 @@
       <td class="key" onclick="insertDigit('0')">0</td>
       <td class="key" onclick="insertDigit('.')">.</td>
       <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
-    </tr>
+<!--    </tr>
       <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
     </tr>
+-->
   </table>
-<script type="text/javascript" src="./math/inputForm.js"></script>
+  <div id="result-container">
+    <p id="final-message"></p>
+    <p id="final-score"></p>
+    <p id="final-elapsed-time"></p>
+    <button id="retry-button" onclick="retryIncorrect()">もう一度間違った問題に挑戦する</button>
+    <div id="incorrect-answers"></div>
+  </div>
+  <script type="text/javascript" src="./math/inputForm.js"></script>
 </body>
 </html>
