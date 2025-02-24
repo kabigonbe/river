@@ -65,7 +65,7 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       height: 640px; /* キーボードと余白を考慮 */
       min-height:calc(100px);
-      max-height:calc(100dvh - 640px);
+      max-height:calc(100dvh - 480px);
       line-height:1.2;
     }
 
@@ -146,7 +146,7 @@
       aspect-ratio:1 / 1;
       content:"";
       position: absolute;
-      top: 20%;
+      top: 10%;
       left:50%;
       width: 200px;
       height:200px;
@@ -159,7 +159,7 @@
 
     .incorrect-mark {
         position: absolute;
-        top: 20%;
+        top: 10%;
         left: 50%;
         width: 200px;  /* サイズ */
         height: 200px;
@@ -789,7 +789,7 @@ function endQuiz() {
     <span id="qform"></span>
   </div>
 
-  <math-field id="mathfield" virtual-keyboard-mode="manual"></math-field>
+  <math-field id="mathfield" virtual-keyboard-mode="off"></math-field>
   
   <table class="keyboard" id="keyboard">
     <tr>
