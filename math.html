@@ -53,8 +53,8 @@
 
     /* クイズのコンテナ */
     #quiz-container {
-/*      flex-grow: 1;
-      display:flex;*/
+      flex-grow: 1;
+      display:flex;
       width: calc(100% - 5px);
       font-size: 24px;
       text-align: left;
@@ -66,19 +66,20 @@
       height: 640px; /* キーボードと余白を考慮 */
       min-height:calc(100px);
       max-height:calc(100dvh - 640px);
+      line-height:1.2;
     }
 
     .qArea {
-      width: 100%;
-      height:100%;
+      width: calc(100% - 10px);
+      height: calc(100% - 5px);
       overflow-y: auto;
       position:relative;
-      margin-bottom: 5px;
-      padding: 15px;
+      margin: 5px;
+      padding: 5px;
       border: 2px solid #ddd;
       border-radius: 8px;
       background: #fff;
-      transition: 0.3s;
+      transition: 0.1s;
       box-sizing: border-box;
     }
     .qArea:hover {
@@ -88,7 +89,7 @@
     .qIndex {
       font-size:24px;
       font-weight: bold;
-      margin-bottom: 1px;
+      margin: 1px;
     }
 
     .qText {
@@ -104,8 +105,8 @@
     }
 
     .answer-container {
-      margin-top: 14px;
-      padding: 10px;
+      margin: 5px;
+      padding: 1px;
       border-top: 1px solid #ddd;
     }
     
@@ -119,7 +120,7 @@
     }
     
     .explanation {
-      font-size: 24px;
+      font-size: 16px;
       color: #555;
       background: #f9f9f9;
       padding: 8px;
@@ -319,18 +320,25 @@
     }
 
     #mathfield {
-      font-size:36px;
+      font-size: 36px;
       width: calc(100% - 5px);
-      height:120px;
+      height: 100px;
       display: flex;
-      vertical-align: middle;
-      align-items: center;
-      margin: 1px;
-      background: white;
-      padding: 5px;
       border-radius: 10px;
       box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
-
+    }
+    
+    /* MathLive の内部コンテンツを上下中央にする */
+    #mathfield::part(content),
+    #mathfield::part(textarea),
+    #mathfield::part(container) {
+      height: 100%;
+    }
+    
+    /* MathLive 内の数式の高さを調整 */
+    #mathfield::part(textarea),
+    #mathfield::part(container) {
+      height: 100%;
     }
 
     .keyboard {
