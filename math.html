@@ -51,6 +51,20 @@
       background: #0056b3;
     }
 
+    #container {
+      display: grid;
+      grid-template-columns: 1fr; /* 初期は1列（スマホ用） */
+      height:100vh;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    @media (min-width: 769px) {
+      #container {
+        grid-template-columns: 1fr minmax(600px,600px); /* 2列レイアウト */
+      }
+    }
+
     /* クイズのコンテナ */
     #quiz-container {
       flex-grow: 1;
@@ -63,9 +77,9 @@
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      height: 640px; /* キーボードと余白を考慮 */
+/*      height: 640px;
       min-height:calc(100px);
-      max-height:calc(100dvh - 640px);
+      max-height:calc(100dvh - 640px);*/
       line-height:1.2;
     }
 
@@ -197,31 +211,12 @@
       color: white;
     }
 
-    /* テーブルのスタイル */
-    table {
-      font-size: 20px;
-      width:100%;
-      margin: 1px;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-    }
-
-    th {
-      width:50px;
-      background:gray;
-      color: white;
-    }
-
-    td {
-      background: #f9f9f9;
+    #math-container {
+      display: flex;
+      flex-direction: column;
+      width:600px;
+      align-items: center;
+      gap: 10px;
     }
 
     #result-container {
@@ -769,46 +764,47 @@ function endQuiz() {
       <select id="category-select" class="dropdown"></select>
       <select id="question-range-select" class="dropdown"></select>
   </div>
-  <div id="quiz-container"></div>
-    <span id="qtext"></span>
-    <span id="qform"></span>
-  </div>
 
-  <math-field id="mathfield" virtual-keyboard-mode="off" readonly></math-field>
-  
-  <table class="keyboard" id="keyboard">
-    <tr>
-      <td class="key" onclick="handleDivision()">分数</td>
-      <td class="key" onclick="insertMixedFraction()">帯分数</td>
-      <td class="key" colspan="2" onclick="clearField()">クリア</td>
-    </tr>
-    <tr>
-      <td class="key" onclick="insertDigit('7')">7</td>
-      <td class="key" onclick="insertDigit('8')">8</td>
-      <td class="key" onclick="insertDigit('9')">9</td>
-      <td class="key" onclick="mathField.executeCommand('deleteBackward')">⌫</td>
-    </tr>
-    <tr>
-      <td class="key" onclick="insertDigit('4')">4</td>
-      <td class="key" onclick="insertDigit('5')">5</td>
-      <td class="key" onclick="insertDigit('6')">6</td>
-      <td class="key" onclick="mathField.executeCommand('moveToNextChar')">➡</td>
-    </tr>
-    <tr>
-      <td class="key" onclick="insertDigit('1')">1</td>
-      <td class="key" onclick="insertDigit('2')">2</td>
-      <td class="key" onclick="insertDigit('3')">3</td>
-      <td class="key" onclick="mathField.executeCommand('moveToPreviousChar')">⬅</td>
-    </tr>
-    <tr>
-      <td class="key" onclick="insertDigit('0')">0</td>
-      <td class="key" onclick="insertDigit('.')">.</td>
-      <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
-<!--    </tr>
-      <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
-    </tr>
+  <div id="container">
+    <div id="quiz-container"></div>
+    <div id="math-container">
+     <math-field id="mathfield" virtual-keyboard-mode="off"></math-field>
+     
+     <table class="keyboard" id="keyboard">
+       <tr>
+         <td class="key" onclick="handleDivision()">分数</td>
+         <td class="key" onclick="insertMixedFraction()">帯分数</td>
+         <td class="key" colspan="2" onclick="clearField()">クリア</td>
+       </tr>
+       <tr>
+         <td class="key" onclick="insertDigit('7')">7</td>
+         <td class="key" onclick="insertDigit('8')">8</td>
+         <td class="key" onclick="insertDigit('9')">9</td>
+         <td class="key" onclick="mathField.executeCommand('deleteBackward')">⌫</td>
+       </tr>
+       <tr>
+         <td class="key" onclick="insertDigit('4')">4</td>
+         <td class="key" onclick="insertDigit('5')">5</td>
+         <td class="key" onclick="insertDigit('6')">6</td>
+         <td class="key" onclick="mathField.executeCommand('moveToNextChar')">➡</td>
+       </tr>
+       <tr>
+         <td class="key" onclick="insertDigit('1')">1</td>
+         <td class="key" onclick="insertDigit('2')">2</td>
+         <td class="key" onclick="insertDigit('3')">3</td>
+         <td class="key" onclick="mathField.executeCommand('moveToPreviousChar')">⬅</td>
+       </tr>
+       <tr>
+         <td class="key" onclick="insertDigit('0')">0</td>
+         <td class="key" onclick="insertDigit('.')">.</td>
+         <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
+<!--   </tr>
+         <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
+       </tr>
 -->
-  </table>
+      </table>
+    </div>
+  </div>
   <div id="result-container">
     <p id="final-message"></p>
     <p id="final-score"></p>
