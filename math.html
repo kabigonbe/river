@@ -59,7 +59,7 @@
       padding: 10px;
     }
 
-    @media (min-width: 769px) {
+    @media (min-width: 900px) {
       #container {
         grid-template-columns: 1fr minmax(480px,480px); /* 2列レイアウト */
       }
@@ -116,21 +116,25 @@
     .qForm {
       font-size:24px;
       font-weight: bold;
+      z-index:3;
     }
 
     .answer-container {
       margin: 5px;
       padding: 1px;
       border-top: 1px solid #ddd;
+      z-index:3;
     }
     
     .user-answer {
       font-size: 24px;
+      z-index:3;
     }
     
     .correct-answer {
       font-size: 24px;
       font-weight: bold;
+      z-index:3;
     }
     
     .explanation {
@@ -139,17 +143,20 @@
       background: #f9f9f9;
       padding: 8px;
       border-radius: 5px;
+      z-index:3;
     }
 
     .next-button {
-      margin-top: 15px;
-      padding: 10px 15px;
+      position:absolute;
+      top:5px;
+      right:10px;
       font-size: 24px;
       border: none;
       background: #007BFF;
       color: white;
       border-radius: 5px;
       cursor: pointer;
+      z-index:3;
     }
     
     .next-button:hover {
@@ -160,8 +167,8 @@
       aspect-ratio:1 / 1;
       content:"";
       position: absolute;
-      top: 10%;
-      left:50%;
+      top: 100px;
+      right:100px;
       width: 200px;
       height:200px;
       border: 20px solid white;
@@ -173,8 +180,8 @@
 
     .incorrect-mark {
         position: absolute;
-        top: 10%;
-        left: 50%;
+        top: 100px;
+        right:100px;
         width: 200px;  /* サイズ */
         height: 200px;
         transform: translate(0%, 0%);
@@ -283,6 +290,17 @@
       color: blue;
     }
     #elapsed-time-container {
+      background: rgba(255,255,255, 0.7);
+      color: black;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 1000;
+      line-height:7px;
+    }
+/*
+    #elapsed-time-container {
       position: fixed;
       top: 10px;
       right: 10px;
@@ -295,6 +313,7 @@
       z-index: 1000;
       line-height:7px;
     }
+*/
     #elapsed-time {
       font-size: 24px;
       font-weight: bold;
@@ -315,9 +334,16 @@
     #mathfield {
       font-size: 36px;
       width: calc(100% - 5px);
-      height: 100px;
+      height: 120px;
       display: flex;
       border-radius: 10px;
+      max-width:220px;
+      align-items: center;  /* ⬅ 中央揃え */
+      justify-content: center; /* ⬅ 水平方向中央揃え（不要なら削除） */
+      overflow: hidden; /* はみ出した部分を隠す */
+      word-wrap: break-word; /* 長い数式を折り返す */
+      white-space: pre-wrap; /* 改行を考慮して折り返し */
+      text-overflow: ellipsis; /* 必要なら「...」で省略 */
     }
     
     /* MathLive の内部コンテンツを上下中央にする */
@@ -342,14 +368,16 @@
 
     .keyboard td {
       text-align: center;
-      font-size: clamp(12px, 2vw, 20px);;
+      font-size: clamp(12px, 3vw, 20px);;
       padding: 8px;
       border: 2px solid #ccc;
       background-color: #f9f9f9;
       cursor: pointer;
       width: 25%;
       border-radius: 10px;
-    }
+      overflow: hidden; /* はみ出し部分を隠す */
+      white-space: nowrap; /* 折り返さずに一行で表示 */
+      text-overflow: ellipsis; /* はみ出した部分を「...」で省略 */    }
     
     .keyboard td:hover {
       background-color: #e0e0e0;
@@ -358,12 +386,12 @@
 
     #footer {
       width: 100%;
-      height:50px;
+      height:25px;
       background: #333;
       color: white;
       text-align: center;
       padding: 10px 0;
-      font-size: 24px;
+      font-size: 18px;
     }
 
   </style>
@@ -494,8 +522,8 @@
           解答: question.解答,
           解説: question.解説.replace("。","<br>"),
           type: question.type,
-          correct:null,
-          回答: null
+          correct:"×",
+          回答: ""
       };
 
       // 問題エリア作成
@@ -518,9 +546,15 @@
       questionForm.innerHTML = question.数式
       questionForm.classList.add("qFormula");
 
+      const nextButton = document.createElement("button");
+      nextButton.textContent = "次の問題へ";
+      nextButton.classList.add("next-button");
+      nextButton.onclick = nextQuestion;
+
       questionDiv.appendChild(questionIndex);
       questionDiv.appendChild(questionText);
       questionDiv.appendChild(questionForm);
+      questionDiv.appendChild(nextButton);
 
       // コンテナに追加
       quizContainer.appendChild(questionDiv);
@@ -558,7 +592,7 @@
     const correctTex = correctAnswers[currentQuestionIndex]["解答"];
     const mathField = document.getElementById("mathfield");
     const userTex = "\\("+mathField.getValue()+"\\)";
-
+    isCorrect = 0;
     // MathJax に数式を MathML としてレンダリング
     MathJax.typesetPromise().then(() => {
       // MathML の内部構造を取得
@@ -585,6 +619,7 @@
 
       
       const mark = document.createElement("div");
+      correctAnswers[currentQuestionIndex]["回答"]=userTex
       if(normalizeMathML(correctMathML) === normalizeMathML(userMathML)){
         questionDiv.style.backgroundColor = "#d4edda";
         mark.classList.add("correct-mark");
@@ -595,7 +630,6 @@
         mark.classList.add("incorrect-mark");
         isCorrect = 0;
         correctAnswers[currentQuestionIndex]["correct"]="×"
-        incorrectAnswers.push(correctAnswers[currentQuestionIndex]);
       }
       questionDiv.insertBefore(mark, questionDiv.firstChild);
 
@@ -608,7 +642,6 @@
       inputText.classList.add("user-answer");
       inputText.innerHTML = `<strong>あなたの回答:</strong> ${userTex}`;
       answerContainer.appendChild(inputText);
-      correctAnswers[currentQuestionIndex]["回答"]=userTex
 
       // 正解の表示
       const answerText = document.createElement("p");
@@ -624,21 +657,18 @@
 
       questionDiv.appendChild(answerContainer);
       MathJax.typesetPromise();
-
-      const nextButton = document.createElement("button");
-      nextButton.textContent = "次の問題へ";
-      nextButton.classList.add("next-button");
-      nextButton.onclick = nextQuestion;
-      answerContainer.appendChild(nextButton);
     });
   }
 
   function nextQuestion() {
-      document.getElementById("mathfield").setValue("");
       if(isCorrect){
         totalScore++;
         document.getElementById("total-score").textContent = totalScore;
+      }else{
+        incorrectAnswers.push(correctAnswers[currentQuestionIndex]);
       }
+
+      document.getElementById("mathfield").setValue("");
       if (currentQuestionIndex < maxQuestions - 1) {
           currentQuestionIndex++;
           createQuiz();
@@ -660,10 +690,7 @@ function endQuiz() {
     let elapsedTime = updateElapsedTime();
 
     // クイズの内容を削除
-    document.getElementById("quiz-container").style.display = "none";
-    document.getElementById("keyboard").style.display = "none";
-    document.getElementById("mathfield").style.display = "none";
-    document.getElementById("elapsed-time-container").style.display = "none";
+    document.getElementById("container").style.display = "none";
 //    document.querySelector(".controls").style.display = "none"; // カテゴリ選択部分も非表示
 
     // 結果メッセージの表示
@@ -727,11 +754,10 @@ function endQuiz() {
       }
     }
 	function init(){
-    document.getElementById("quiz-container").style.display = "block";
-    document.getElementById("keyboard").style.display = "table";
-    document.getElementById("mathfield").style.display = "block";
-    document.getElementById("elapsed-time-container").style.display = "block";
-    document.querySelector(".controls").style.display = "block"; // カテゴリ選択部分も再表示
+    document.getElementById("container").style.display = "grid";
+
+//    document.getElementById("quiz-container").style.display = "block";
+//    document.querySelector(".controls").style.display = "block"; // カテゴリ選択部分も再表示
     document.getElementById("result-container").style.display = "none";
     resultAnswers = [];
     incorrectAnswers = []; // クリア
@@ -754,10 +780,6 @@ function endQuiz() {
     window.onload = loadJson;
 
 </script>
-  <div id="elapsed-time-container">
-    <p>経過時間: <span id="elapsed-time">0</span> 秒</p>
-    <p>合計得点: <span id="total-score">0</span> / <span id="total-questions">0</span></p>
-  </div>
   <div class="controls">
       <select id="category-select" class="dropdown"></select>
       <select id="question-range-select" class="dropdown"></select>
@@ -766,40 +788,49 @@ function endQuiz() {
   <div id="container">
     <div id="quiz-container"></div>
     <div id="math-container">
-     <math-field id="mathfield" virtual-keyboard-mode="off"></math-field>
-     
-     <table class="keyboard" id="keyboard">
-       <tr>
-         <td class="key" onclick="handleDivision()">分数</td>
-         <td class="key" onclick="insertMixedFraction()">帯分数</td>
-         <td class="key" colspan="2" onclick="clearField()">クリア</td>
-       </tr>
-       <tr>
-         <td class="key" onclick="insertDigit('7')">7</td>
-         <td class="key" onclick="insertDigit('8')">8</td>
-         <td class="key" onclick="insertDigit('9')">9</td>
-         <td class="key" onclick="mathField.executeCommand('deleteBackward')">⌫</td>
-       </tr>
-       <tr>
-         <td class="key" onclick="insertDigit('4')">4</td>
-         <td class="key" onclick="insertDigit('5')">5</td>
-         <td class="key" onclick="insertDigit('6')">6</td>
-         <td class="key" onclick="mathField.executeCommand('moveToNextChar')">➡</td>
-       </tr>
-       <tr>
-         <td class="key" onclick="insertDigit('1')">1</td>
-         <td class="key" onclick="insertDigit('2')">2</td>
-         <td class="key" onclick="insertDigit('3')">3</td>
-         <td class="key" onclick="mathField.executeCommand('moveToPreviousChar')">⬅</td>
-       </tr>
-       <tr>
-         <td class="key" onclick="insertDigit('0')">0</td>
-         <td class="key" onclick="insertDigit('.')">.</td>
-         <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
-<!--   </tr>
-         <td id="footer" colspan="4">Copyright ©oji40san. All Rights Reserved.</td>
-       </tr>
--->
+    </table>
+    <table class="keyboard" id="keyboard">
+      <tr>
+        <td colspan="2">
+          <math-field id="mathfield" virtual-keyboard-mode="off"></math-field>
+        </td>
+        <td colspan="2">
+          <div id="elapsed-time-container">
+            <p>経過時間: <span id="elapsed-time">0</span> 秒</p>
+            <p>合計得点: <span id="total-score">0</span> / <span id="total-questions">0</span></p>
+          </div>
+        </td>
+      <tr>
+        <td class="key" onclick="handleDivision()">分数</td>
+        <td class="key" onclick="insertMixedFraction()">帯分数</td>
+        <td class="key" colspan="2" onclick="clearField()">クリア</td>
+      </tr>
+      <tr>
+        <td class="key" onclick="insertDigit('7')">7</td>
+        <td class="key" onclick="insertDigit('8')">8</td>
+        <td class="key" onclick="insertDigit('9')">9</td>
+        <td class="key" onclick="mathField.executeCommand('deleteBackward')">⌫</td>
+      </tr>
+      <tr>
+        <td class="key" onclick="insertDigit('4')">4</td>
+        <td class="key" onclick="insertDigit('5')">5</td>
+        <td class="key" onclick="insertDigit('6')">6</td>
+        <td class="key" onclick="mathField.executeCommand('moveToNextChar')">➡</td>
+      </tr>
+      <tr>
+        <td class="key" onclick="insertDigit('1')">1</td>
+        <td class="key" onclick="insertDigit('2')">2</td>
+        <td class="key" onclick="insertDigit('3')">3</td>
+        <td class="key" onclick="mathField.executeCommand('moveToPreviousChar')">⬅</td>
+      </tr>
+      <tr>
+        <td class="key" onclick="insertDigit('0')">0</td>
+        <td class="key" onclick="insertDigit('.')">.</td>
+        <td class="key" colspan="2" onclick="checkAnswer()">決定</td>
+      </tr>
+        <td id="footer" colspan="4">© @keisan_manabu. All Rights Reserved.</td>
+      </tr>
+
       </table>
     </div>
   </div>
