@@ -330,8 +330,21 @@
         border: 1px solid #aaa; /* 境界線を少し目立たせる */
     }
 
+    #mathfield2 {
+      font-size: 36px;
+      width: calc(100% - 5px);
+      height: 120px;
+      border-radius: 10px;
+      max-width:220px;
+      align-items: center;  /* ⬅ 中央揃え */
+      justify-content: center; /* ⬅ 水平方向中央揃え（不要なら削除） */
+      overflow: hidden; /* はみ出した部分を隠す */
+      word-wrap: break-word; /* 長い数式を折り返す */
+      white-space: pre-wrap; /* 改行を考慮して折り返し */
+      text-overflow: ellipsis; /* 必要なら「...」で省略 */
+    }
+
     #mathfield {
-      display:inline;
       font-size: 36px;
       width: calc(100% - 5px);
       height: 120px;
@@ -782,6 +795,7 @@ function endQuiz() {
       <select id="category-select" class="dropdown"></select>
       <select id="question-range-select" class="dropdown"></select>
   </div>
+  <math-field id="mathfield2" virtual-keyboard-mode="off"></math-field>
 
   <div id="container">
     <div id="quiz-container"></div>
