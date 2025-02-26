@@ -52,22 +52,16 @@
       background: #0056b3;
     }
 
+
     #container {
       display: grid;
       flex-grow: 1;
       display:flex;
       grid-template-columns: 1fr; /* 初期は1列（スマホ用） */
       height:auto;
-      gap: 10px;
-      padding: 10px;
+      gap: 5px;
+      padding: 5px;
     }
-
-    @media (orientation: landscape) {
-      #container {
-        grid-template-columns: 1fr minmax(480px,480px); /* 2列レイアウト */
-      }
-    }
-
 
     /* クイズのコンテナ */
     #quiz-container {
@@ -87,8 +81,34 @@
       line-height:1.2;
     }
 
+    #math-container {
+      width:100%;
+      align-items: center;
+      gap: 10px;
+    }
+
+
+    @media (orientation: landscape) {
+      #container {
+        grid-template-columns: 1fr minmax(480px,480px); /* 2列レイアウト */
+      }
+    }
+
+    @media (orientation: portrait) {
+      .keyboard td {
+        font-size: 60px; /* 縦のときだけ文字サイズUP */
+      }
+    }
+
+/*    @media (max-width: 600px) {
+      #container {
+        transform: scale(1.0);
+        transform-origin: top left;
+      }
+    }
+*/
     .qArea {
-      width: calc(100% - 10px);
+      width: calc(100% - 5px);
       height: calc(100% - 5px);
       overflow-y: auto;
       position:relative;
@@ -220,12 +240,6 @@
     .incorrect {
       background-color: #dc3545 !important;
       color: white;
-    }
-
-    #math-container {
-      width:100%;
-      align-items: center;
-      gap: 10px;
     }
 
     #result-container {
@@ -363,16 +377,17 @@
 
     .keyboard {
       width: 100%;
+      height:600px;
+      table-layout:fixed;
       border-collapse: separate;
       font-weight: bold;
       touch-action: manipulation;
-      max-height:100px;
     }
 
     .keyboard td {
       text-align: center;
       font-size: 2.5vw;
-      padding: 8px;
+      padding: 4px;
       border: 2px solid #ccc;
       background-color: #f9f9f9;
       cursor: pointer;
@@ -380,7 +395,7 @@
       border-radius: 10px;
       overflow: hidden; /* はみ出し部分を隠す */
       white-space: nowrap; /* 折り返さずに一行で表示 */
-      text-overflow: ellipsis; /* はみ出した部分を「...」で省略 */    }
+    }
     
     .keyboard td:hover {
       background-color: #e0e0e0;
@@ -389,7 +404,6 @@
 
     #footer {
       width: 100%;
-      height:25px;
       background: #333;
       color: white;
       text-align: center;
@@ -780,7 +794,27 @@ function endQuiz() {
     createQuiz();
   }
 
-    window.onload = loadJson;
+  function updateViewport() {
+      let viewport = document.querySelector("meta[name=viewport]");
+      if (!viewport) {
+          viewport = document.createElement("meta");
+          viewport.name = "viewport";
+          document.head.appendChild(viewport);
+      }
+  
+      if (window.deviceWidth > 640) {
+          // 高解像度デバイス（Retina など）向け
+          viewport.content = "width=device-width, initial-scale=1";
+      } else {
+          // 通常の解像度向け
+          viewport.content = "width=device-width, initial-scale=0.5";
+      }
+  }
+
+
+  updateViewport();
+  window.addEventListener("resize", updateViewport);
+  window.onload = loadJson;
 
 </script>
   <div class="controls">
@@ -795,7 +829,7 @@ function endQuiz() {
     <table class="keyboard" id="keyboard">
       <tr>
         <td colspan="2">
-          <math-field id="mathfield" virtual-keyboard-mode="off" readonly></math-field>
+          <math-field id="mathfield" math-virtual-keyboard-policy="manual" readonly></math-field>
         </td>
         <td colspan="2">
           <div id="elapsed-time-container">
