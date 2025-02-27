@@ -2,7 +2,7 @@
   "工夫する計算": [
     {
       "index": 1,
-      "問題文": "てすと",
+      "問題文": "次の\\( \\Box \\)を求めましょう。",
       "数式": "<img src='https://kabigonbe.github.io/river/images/triangle.png' id='image' />",
       "正解": "80",
       "解説": "二等辺三角形であることに目をつけてみよう！<br> \\( (180^{ \\circ } - 20^{ \\circ }) \\div 2 = 80^{ \\circ }\\)",
