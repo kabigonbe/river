@@ -3,10 +3,10 @@
     {
       "index": 1,
       "問題文": "てすと",
-      "数式": "<img src='https://phonemantra.com/wp-content/uploads/2023/10/canon-r5-mark-ii.jpg' id='image' alt='テスト画像' />",
-      "正解": "\\( 4\\dfrac14 \\)",
-      "解説": "帯分数の足し算は、整数と分数を別々に足すと速く解けるよ。仮分数に直してから足すのは時間がもったいないので気を付けよう。",
-      "type": "足し算"
+      "数式": "<img src='https://kabigonbe.github.io/river/images/triangle.png' id='image' />",
+      "正解": "80",
+      "解説": "二等辺三角形であることに目をつけてみよう！<br> \\( (180^{ \\circ } - 20^{ \\circ }) \\div 2 = 80^{ \\circ }\\)",
+      "type": "角度"
     },
     {
       "index": 2,
