@@ -477,7 +477,7 @@
       rangeSelect.innerHTML = "";
       questionRanges[category] = [];
     
-      for (let i = 1; i <= maxIndex; i += 20) {
+      for (let i = 1; i <= maxIndex; i += 10) {
         let end = Math.min(i + 19, maxIndex);
         let rangeLabel = `${i}～${end}`;
         questionRanges[category].push({ start: i, end: end });
