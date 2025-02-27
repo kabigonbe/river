@@ -65,10 +65,9 @@
 
     /* クイズのコンテナ */
     #quiz-container {
-      flex-grow: 1;
       display:flex;
       width: calc(100% - 5px);
-      height:auto;
+      height:calc(100dvh - 50px);
       font-size: 24px;
       text-align: left;
       margin: 1px;
@@ -76,17 +75,20 @@
       padding: 5px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-/*      height: 640px;
-      min-height:calc(400px);*/
       line-height:1.2;
     }
 
     #math-container {
       width:100%;
+      height:500px;
       align-items: center;
       gap: 10px;
     }
 
+    #image{
+      max-width:calc(100% - 100px);
+      max-height:calc(100dvh - 400px);
+    }
 
     @media (orientation: landscape) {
       #container {
@@ -96,7 +98,10 @@
 
     @media (orientation: portrait) {
       .keyboard td {
-        font-size: 60px; /* 縦のときだけ文字サイズUP */
+        font-size: 60px;
+      }
+      #quiz-container{
+        height:calc(100dvh - 500px);
       }
     }
 
@@ -109,7 +114,7 @@
 */
     .qArea {
       width: calc(100% - 5px);
-      height: calc(100% - 5px);
+/*      height: calc(100dvh - 80px);*/
       overflow-y: auto;
       position:relative;
       margin: 5px;
@@ -180,6 +185,7 @@
       color: white;
       border-radius: 5px;
       cursor: pointer;
+      touch-action: manipulation;
       z-index:3;
     }
     
@@ -267,7 +273,6 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: normal;
-      overflow:hidden;
     }
 
     .result-table th {
@@ -377,7 +382,6 @@
 
     .keyboard {
       width: 100%;
-      height:600px;
       table-layout:fixed;
       border-collapse: separate;
       font-weight: bold;
@@ -530,13 +534,14 @@
           endQuiz();
           return;
       }
+      isCorrect = 0;
 
       const question = questions[index];
       correctAnswers[index] = {
           index: question.index,
           問題文: question.問題文,
           数式: question.数式,
-          解答: question.解答,
+          正解: question.正解,
           解説: question.解説.replace("。","<br>"),
           type: question.type,
           correct:"×",
@@ -606,10 +611,9 @@
   }
 
   function checkAnswer() {
-    const correctTex = correctAnswers[currentQuestionIndex]["解答"];
+    const correctTex = correctAnswers[currentQuestionIndex]["正解"];
     const mathField = document.getElementById("mathfield");
     const userTex = "\\("+mathField.getValue()+"\\)";
-    isCorrect = 0;
     // MathJax に数式を MathML としてレンダリング
     MathJax.typesetPromise().then(() => {
       // MathML の内部構造を取得
@@ -622,7 +626,7 @@
       // 正規化して比較
 
       const questionDiv = document.getElementById(`question`);
-      // 以前の正誤マーク・解答エリアを削除
+      // 以前の正誤マーク・正解エリアを削除
       showCorrectMark();
 
       let existingAnswer = questionDiv.querySelector(".answer-container");
@@ -650,7 +654,7 @@
       }
       questionDiv.insertBefore(mark, questionDiv.firstChild);
 
-      // 解答エリアを作成
+      // 正解エリアを作成
       const answerContainer = document.createElement("div");
       answerContainer.classList.add("answer-container");
 
@@ -678,7 +682,7 @@
   }
 
   function nextQuestion() {
-      if(isCorrect){
+      if(isCorrect===1){
         totalScore++;
         document.getElementById("total-score").textContent = totalScore;
       }else{
@@ -714,7 +718,10 @@ function endQuiz() {
     document.getElementById("result-container").style.display = "block";
 
     let finalMessage = document.getElementById("final-message");
+    console.log(totalScore);
+    console.log(questions.length);
     if (totalScore === questions.length) {
+        console.log("aaa")
         finalMessage.textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
     } else {
         finalMessage.textContent = `全問解答完了！お疲れ様でした🎉`;
@@ -739,12 +746,12 @@ function endQuiz() {
     const retryButton = document.getElementById("retry-button");
 
     if (incorrectAnswers.length > 0) {
-        let html = `<h2>間違った問題の正しい解答</h2>`;
+        let html = `<h2>間違った問題</h2>`;
         incorrectAnswers.forEach(q => {
             html += `
                 <table class="result-table">
                     <tr><th>問題</th><td><p>${q.問題文}</p><p>${q.数式}</p></td></tr>
-                    <tr><th>正解</th><td>${q.解答}</td></tr>
+                    <tr><th>正解</th><td>${q.正解}</td></tr>
                     <tr><th>回答</th><td>${q.回答}</td></tr>
                     <tr><th>解説</th><td>${q.解説 || "なし"}</td></tr>
                 </table><br>`;
@@ -810,11 +817,17 @@ function endQuiz() {
           viewport.content = "width=device-width, initial-scale=0.5";
       }
   }
-
+document.addEventListener("DOMContentLoaded", () => {
+    let mathContainer = document.getElementById("math-container");
+    let size = mathContainer.getBoundingClientRect();
+    console.log(`幅: ${size.width}px, 高さ: ${size.height}px`);
+});
 
   updateViewport();
   window.addEventListener("resize", updateViewport);
   window.onload = loadJson;
+  console.log(screen.height);
+
 
 </script>
   <div class="controls">
@@ -829,7 +842,7 @@ function endQuiz() {
     <table class="keyboard" id="keyboard">
       <tr>
         <td colspan="2">
-          <math-field id="mathfield" math-virtual-keyboard-policy="manual" readonly></math-field>
+          <math-field id="mathfield" math-virtual-keyboard-policy="manual"></math-field>
         </td>
         <td colspan="2">
           <div id="elapsed-time-container">
