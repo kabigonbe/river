@@ -3,7 +3,7 @@
     {
       "index": 0,
       "問題文": "てすと",
-      "数式": "<img src='https://phonemantra.com/wp-content/uploads/2023/10/canon-r5-mark-ii.jpg' id="image" alt='テスト画像' />",
+      "数式": "<img src='https://phonemantra.com/wp-content/uploads/2023/10/canon-r5-mark-ii.jpg' id='image' alt='テスト画像' />",
       "正解": "\\( 4\\dfrac14 \\)",
       "解説": "帯分数の足し算は、整数と分数を別々に足すと速く解けるよ。仮分数に直してから足すのは時間がもったいないので気を付けよう。",
       "type": "足し算"
