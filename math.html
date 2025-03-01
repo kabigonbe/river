@@ -439,25 +439,41 @@
         const response = await fetch('https://kabigonbe.github.io/river/jsons/question.json');
 //        const response = await fetch('http://192.168.3.7:8000/jsons/question.json');
         allQuestions = await response.json(); // ここで questions にデータを格納
-//        console.log(allQuestions)
+        const { category, index } = getQueryParams();
+        if (category && !isNaN(index)) {
+            // 特定の問題を取得
+            const questionList = allQuestions[category] || [];
+            const selectedQuestion = questionList.find(q => q.index === index);
 
-        const $categorySelect = document.getElementById("category-select");
-
-        Object.keys(allQuestions).forEach(categoryName => {
-          let option = document.createElement("option");
-          option.value = categoryName;
-          option.textContent = categoryName;
-          $categorySelect.appendChild(option);
-        });
-
-        // 初回のカテゴリを選択
-        $categorySelect.selectedIndex = 0;
-        updateQuestionRanges();
-
-        $categorySelect.addEventListener("change", updateQuestionRanges);
-        document.getElementById("question-range-select").addEventListener("change", startQuiz);
-
-        startQuiz();
+            console.log(selectedQuestion)
+            if (selectedQuestion) {
+                questions = [selectedQuestion]; // 1問だけセット
+            } else {
+                console.warn("指定された問題が見つかりません。");
+                return;
+            }
+        } else {
+          const $categorySelect = document.getElementById("category-select");
+  
+          Object.keys(allQuestions).forEach(categoryName => {
+            let option = document.createElement("option");
+            option.value = categoryName;
+            option.textContent = categoryName;
+            $categorySelect.appendChild(option);
+          });
+  
+          // 初回のカテゴリを選択
+          $categorySelect.selectedIndex = 0;
+          updateQuestionRanges();
+  
+          $categorySelect.addEventListener("change", updateQuestionRanges);
+          document.getElementById("question-range-select").addEventListener("change", startQuiz);
+  
+          startQuiz();
+        }
+        document.getElementById("total-questions").textContent = questions.length;
+        init();
+        createQuiz();
 
       } catch (error) {
         console.error('エラー:', error);
@@ -818,6 +834,16 @@ function endQuiz() {
           viewport.content = "width=device-width, initial-scale=0.5";
       }
   }
+
+  function getQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      console.log(params)
+      return {
+          category: params.get("category"), // カテゴリ名
+          index: parseInt(params.get("index"), 10) // 問題番号（整数に変換）
+      };
+  }
+
 document.addEventListener("DOMContentLoaded", () => {
     let mathContainer = document.getElementById("math-container");
     let size = mathContainer.getBoundingClientRect();
