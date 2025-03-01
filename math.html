@@ -564,7 +564,7 @@
           問題文: question.問題文,
           数式: question.数式,
           正解: question.正解,
-          解説: question.解説.replace("。","<br>"),
+          解説:  (question.解説 || "").replace(/。/g, "<br>"),
           type: question.type,
           correct:"×",
           回答: ""
