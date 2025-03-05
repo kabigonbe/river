@@ -359,6 +359,17 @@
         border: 1px solid #aaa; /* 境界線を少し目立たせる */
     }
 
+    #retryCopy-button {
+      color: white;
+    }
+
+    #retryCopy-button:disabled {
+        background: #ccc;      /* グレー背景 */
+        color: #666;           /* 文字色も薄くする */
+        cursor: not-allowed;   /* カーソルを「禁止マーク」にする */
+        border: 1px solid #aaa; /* 境界線を少し目立たせる */
+    }
+
     #mathfield {
       font-size: 36px;
       width: calc(100% - 5px);
@@ -410,6 +421,9 @@
       background-color: #e0e0e0;
     }
     
+    .relation-button {
+      color: white;
+    }
 
     #footer {
       width: 100%;
@@ -426,6 +440,7 @@
 <script>
     let questions = [];
     let allQuestions = {};
+    let filterQuestions = {};
     let questionRanges = {};
     let correctAnswers = [];
     let answeredQuestions = new Set();
@@ -441,45 +456,52 @@
     // JSONデータを取得する関数
     async function loadJson() {
       try {
-        const response = await fetch('https://kabigonbe.github.io/river/jsons/question.json');
+        const response = await fetch('https://kabigonbe.github.io/river/jsons/test_question.json');
 //        const response = await fetch('http://192.168.3.7:8000/jsons/question.json');
         allQuestions = await response.json(); // ここで questions にデータを格納
-        const { category, index } = getQueryParams();
-        if (category && !isNaN(index)) {
-            // 特定の問題を取得
-            const questionList = allQuestions[category] || [];
-            const selectedQuestion = questionList.find(q => q.index === index);
+        filterQuestions = structuredClone(allQuestions);
+        const { indexes,tagList } = getQueryParams();
 
-            console.log(selectedQuestion)
-            if (selectedQuestion) {
-                questions = [selectedQuestion]; // 1問だけセット
-            } else {
-                console.warn("指定された問題が見つかりません。");
-                return;
-            }
-        } else {
-          const $categorySelect = document.getElementById("category-select");
-  
-          Object.keys(allQuestions).forEach(categoryName => {
-            let option = document.createElement("option");
-            option.value = categoryName;
-            option.textContent = categoryName;
-            $categorySelect.appendChild(option);
+        if (tagList.length > 0) {
+          // カテゴリごとにフィルタする
+          Object.keys(filterQuestions).forEach(cat => {
+            filterQuestions[cat] = filterQuestions[cat].filter(q => 
+              tagList.some(tag => q.tags.includes(tag)) 
+              // ↑OR条件: いずれかのタグが含まれていればOK
+              // もし全タグを含む問題に絞りたいなら every() にする
+              // tagList.every(tag => q.tags.includes(tag))
+            );
           });
+        }
+
+        const $categorySelect = document.getElementById("category-select");
+        const $difficultySelect = document.getElementById("difficulty-select");
   
-          // 初回のカテゴリを選択
-          $categorySelect.selectedIndex = 0;
-          updateQuestionRanges();
+        Object.keys(filterQuestions).forEach(categoryName => {
+          let option = document.createElement("option");
+          option.value = categoryName;
+          option.textContent = categoryName;
+          $categorySelect.appendChild(option);
+        });
+
+        // 初回のカテゴリを選択
+        $categorySelect.selectedIndex = 0;
+        updateQuestionRanges();
   
-          $categorySelect.addEventListener("change", updateQuestionRanges);
-          document.getElementById("question-range-select").addEventListener("change", startQuiz);
-  
-          startQuiz();
+        $categorySelect.addEventListener("change", updateQuestionRanges);
+        $categorySelect.addEventListener("change", selectedQuestionsAndStart);
+        $difficultySelect.addEventListener("change", updateQuestionRanges);
+        $difficultySelect.addEventListener("change", selectedQuestionsAndStart);
+        document.getElementById("question-range-select").addEventListener("change", selectedQuestionsAndStart);
+
+        if (indexes.length > 0) {
+          questions = createQuestionsFromIndexes(indexes);
+        } else {
+          updateQuestions();
         }
         document.getElementById("total-questions").textContent = questions.length;
         init();
         createQuiz();
-
       } catch (error) {
         console.error('エラー:', error);
       }
@@ -492,21 +514,25 @@
 
     function updateQuestionRanges() {
       const category = document.getElementById("category-select").value;
-      const questionList = allQuestions[category] || [];
-      const maxIndex = Math.max(...questionList.map(q => q.index), 1);
+      const levels = document.getElementById("difficulty-select").value.split(",");
+      filterQuestions = structuredClone(allQuestions);
+      Object.keys(filterQuestions).forEach(cat => {
+        filterQuestions[cat] = filterQuestions[cat].filter(q => 
+          levels.some(levels => q.難易度.toString().includes(levels)) 
+        );
+      });
+      let questionList = filterQuestions[category] || [];
+      const maxIndex = questionList.length;
       const rangeSelect = document.getElementById("question-range-select");
-    
+      
       rangeSelect.innerHTML = "";
       questionRanges[category] = [];
     
       for (let i = 1; i <= maxIndex; i += 10) {
         let end = Math.min(i + 9, maxIndex);
-        let rangeLabel = `${i}～${end}`;
-        questionRanges[category].push({ start: i, end: end });
-    
         let option = document.createElement("option");
         option.value = `${i}-${end}`;
-        option.textContent = rangeLabel;
+        option.textContent = `${i}～${end}`;
         rangeSelect.appendChild(option);
       }
 
@@ -521,37 +547,43 @@
       rangeSelect.appendChild(randomOption);
     
       rangeSelect.selectedIndex = 0;
-      startQuiz();
+      init();
+      createQuiz();
     }
 
-    function startQuiz() {
+    function updateQuestions(){
       const category = document.getElementById("category-select").value;
+      const levels = document.getElementById("difficulty-select").value.split(",");
+      filterQuestions = structuredClone(allQuestions);
+      Object.keys(filterQuestions).forEach(cat => {
+        filterQuestions[cat] = filterQuestions[cat].filter(q => 
+          levels.some(levels => q.難易度.toString().includes(levels)) 
+        );
+      });
+      let questionList = filterQuestions[category] || [];
       const range = document.getElementById("question-range-select").value;
-      let selectedQuestions = allQuestions[category] || [];
-    
       if (range === "random") {
-        selectedQuestions = getRandomQuestions(selectedQuestions, 10);
+        questionList = getRandomQuestions(questionList, 10);
       } else if (range === "all") {
         // すべての問題を出題
       } else {
         const [start, end] = range.split("-").map(Number);
-        selectedQuestions = selectedQuestions.filter(q => q.index >= start && q.index <= end);
+        questionList = questionList.slice(start-1,end);
       }
     
-      questions = selectedQuestions;
-
+      questions = questionList.map(q => ({ ...q, category }));
       document.getElementById("total-questions").textContent = questions.length;
+    }
+    function selectedQuestionsAndStart(){
+      updateQuestions();
       init();
       createQuiz();
-      updateElapsedTime();
     }
-
 
     function createQuiz() {
       const index = currentQuestionIndex;
       const quizContainer = document.getElementById("quiz-container");
       quizContainer.innerHTML = "";
-//      console.log(index)
       if (currentQuestionIndex >= questions.length) {
           endQuiz();
           return;
@@ -560,11 +592,16 @@
 
       const question = questions[index];
       correctAnswers[index] = {
+          category:question.category,
           index: question.index,
           問題文: question.問題文,
-          数式: question.数式,
-          正解: question.正解,
+          数式:   question.数式,
+          正解:   question.正解,
           解説:  (question.解説 || "").replace(/。/g, "<br>"),
+          tags:   question.tags,
+          難易度: question.難易度,
+          類題ids:question.類題ids,
+
           type: question.type,
           correct:"×",
           回答: ""
@@ -731,7 +768,9 @@
 
 function endQuiz() {
     let elapsedTime = updateElapsedTime();
-
+    if(questions.length === 0){
+      return;
+    }
     // クイズの内容を削除
     document.getElementById("container").style.display = "none";
 //    document.querySelector(".controls").style.display = "none"; // カテゴリ選択部分も非表示
@@ -740,10 +779,10 @@ function endQuiz() {
     document.getElementById("result-container").style.display = "block";
 
     let finalMessage = document.getElementById("final-message");
-    console.log(totalScore);
-    console.log(questions.length);
+//    console.log(totalScore);
+//    console.log(questions.length);
     if (totalScore === questions.length) {
-        console.log("aaa")
+//        console.log("aaa")
         finalMessage.textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
     } else {
         finalMessage.textContent = `全問解答完了！お疲れ様でした🎉`;
@@ -766,25 +805,42 @@ function endQuiz() {
     }
     incorrectContainer.innerHTML = ""; // 以前の内容をクリア
     const retryButton = document.getElementById("retry-button");
-
+    const retryCopyButton = document.getElementById("retryCopy-button");
     if (incorrectAnswers.length > 0) {
         let html = `<h2>間違った問題</h2>`;
         incorrectAnswers.forEach(q => {
+//      <button class="relation-button" onclick="tryRelations('${q.類題ids}')">
+          let buttonHtml = "";
+          if (q.類題ids.length > 0) {
+            let relation_link = window.location.href.split("?")[0] + "?index=" + q.類題ids.join(",");
+            buttonHtml = `
+                <button class="relation-button" onclick="window.open('${relation_link}','_blank')">
+                    類題を解いてみる
+                </button>
+            `;
+          }
+            console.log(q.category);
             html += `
                 <table class="result-table">
-                    <tr><th>問題</th><td><p>${q.問題文}</p><p>${q.数式}</p></td></tr>
+                    <tr><th>index</th><td>
+                      ${q.category}_${q.index}
+                      ${buttonHtml}
+                    <tr><th>問題</th><td><p></p><p> ${q.問題文}</p><p>${q.数式}</p></td></tr>
                     <tr><th>正解</th><td>${q.正解}</td></tr>
                     <tr><th>回答</th><td>${q.回答}</td></tr>
                     <tr><th>解説</th><td>${q.解説 || "なし"}</td></tr>
+                    <tr><th>難易度</th><td>${q.難易度}</td></tr>
                 </table><br>`;
         });
         incorrectContainer.innerHTML = html;
-        retryButton.disabled = false;
+        retryButton.disabled     = false;
+        retryCopyButton.disabled = false;
     } else {
 //        incorrectContainer.innerHTML = `<p>全問正解でした！🎉</p>`;
-        retryButton.disabled = true;
+        retryButton.disabled     = true;
+        retryCopyButton.disabled = true;
     }
-    
+
     // 再挑戦ボタンの追加
 //    document.getElementById("quiz-container").style.display = "button";
 
@@ -793,17 +849,14 @@ function endQuiz() {
     MathJax.typesetPromise();
 }
 
-    function scrollToNextQuestion(currentIndex) {
-      const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
-      if (nextQuestion) {
-        nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+  function scrollToNextQuestion(currentIndex) {
+    const nextQuestion = document.getElementById(`question-${currentIndex + 1}`);
+    if (nextQuestion) {
+      nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
 	function init(){
     document.getElementById("container").style.display = "grid";
-
-//    document.getElementById("quiz-container").style.display = "block";
-//    document.querySelector(".controls").style.display = "block"; // カテゴリ選択部分も再表示
     document.getElementById("result-container").style.display = "none";
     resultAnswers = [];
     incorrectAnswers = []; // クリア
@@ -811,16 +864,30 @@ function endQuiz() {
     currentQuestionIndex=0;
 		totalScore=0;
 		startTime=Date.now();
+    updateElapsedTime();
     document.getElementById("total-score").textContent = totalScore;
     document.getElementById("total-questions").textContent = questions.length;
-//    document.getElementById("retry-button").style.display = "none"; // やり直しボタンを隠す
 	}
 
   function retryIncorrect() {
     questions = incorrectAnswers;
     init();
-    console.log(questions)
+//    console.log(questions)
     createQuiz();
+  }
+
+  function retryUrlCopy(){
+    const Ids = incorrectAnswers.map(q => `${q.category}_${q.index}`);
+    url = window.location.href.split("?")[0] + "?index=" + Ids.join(",");
+    console.log(url)
+    if (window.confirm("再挑戦用URLをクリップボードにコピーしますか？\n")) {
+        // OKを押したらクリップボードにコピー
+        navigator.clipboard.writeText(url)
+            .then(() => alert("URLをコピーしました！"))
+            .catch(err => alert("コピーに失敗しました: " + err));
+    } else {
+        console.log("コピーがキャンセルされました");
+    }
   }
 
   function updateViewport() {
@@ -841,29 +908,82 @@ function endQuiz() {
   }
 
   function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
-      console.log(params)
-      return {
-          category: params.get("category"), // カテゴリ名
-          index: parseInt(params.get("index"), 10) // 問題番号（整数に変換）
-      };
+    const params = new URLSearchParams(window.location.search);
+    const indexParam = params.get("index");
+    const tagParam = params.get("tags");
+
+    let indexes = [];
+    if (indexParam) {
+      indexes = indexParam.split(",");
+      // 例: "1,2,5" → [1, 2, 5]
+    }
+    let tagList = [];
+    if (tagParam) {
+      // カンマ区切りで分割し、["計算", "工夫"]などの配列にする
+      tagList = tagParam.split(",");
+    }
+    return { indexes, tagList };
+  }
+
+
+function findQuestionByUid(uidString) {
+    const { category, localId } = parseUid(uidString);
+    
+    const questionList = allQuestions[category];
+    if (!questionList) return null;
+
+    const question = questionList.find(q => q.index === localId);
+    return question ? { ...question, category } : null;
+}
+
+  function parseUid(uid) {
+    const [category, localIdStr] = uid.split("_");
+    return {
+      category,
+      localId: parseInt(localIdStr, 10)
+    };
+  }
+
+  function createQuestionsFromIndexes(uidStrings) {
+    let relatedQuestions = [];
+    uidStrings.forEach(uid => {
+      const relatedQuestion = findQuestionByUid(uid);
+      if (relatedQuestion) {
+        relatedQuestions.push(relatedQuestion);
+      }
+    });
+  
+    return relatedQuestions;
+  }
+
+  function tryRelations(uidStrings) {
+    const uidList = uidStrings.split(",");
+    questions = createQuestionsFromIndexes(uidList);
+    init();
+    createQuiz();
   }
 
 document.addEventListener("DOMContentLoaded", () => {
     let mathContainer = document.getElementById("math-container");
     let size = mathContainer.getBoundingClientRect();
-    console.log(`幅: ${size.width}px, 高さ: ${size.height}px`);
+//    console.log(`幅: ${size.width}px, 高さ: ${size.height}px`);
 });
 
   updateViewport();
   window.addEventListener("resize", updateViewport);
   window.onload = loadJson;
-  console.log(screen.height);
+//  console.log(screen.height);
 
 
 </script>
   <div class="controls">
       <select id="category-select" class="dropdown"></select>
+      <select id="difficulty-select" class="dropdown">
+        <option value ="0,1,2,3,4,5">全部</option>
+        <option value ="0,1"        >簡単</option>
+        <option value ="2,3"        >普通</option>
+        <option value ="4,5"        >難しい</option>
+      </select>
       <select id="question-range-select" class="dropdown"></select>
   </div>
 
@@ -921,6 +1041,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <p id="final-score"></p>
     <p id="final-elapsed-time"></p>
     <button id="retry-button" onclick="retryIncorrect()">もう一度間違った問題に挑戦する</button>
+    <button id="retryCopy-button" onclick="retryUrlCopy()">リトライURLをコピーする</button>
     <div id="incorrect-answers"></div>
   </div>
   <script type="text/javascript" src="./math/inputForm.js"></script>
