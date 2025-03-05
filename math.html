@@ -462,18 +462,6 @@
         filterQuestions = structuredClone(allQuestions);
         const { indexes,tagList } = getQueryParams();
 
-        if (tagList.length > 0) {
-          // カテゴリごとにフィルタする
-          Object.keys(filterQuestions).forEach(cat => {
-            filterQuestions[cat] = filterQuestions[cat].filter(q => 
-              tagList.some(tag => q.tags.includes(tag)) 
-              // ↑OR条件: いずれかのタグが含まれていればOK
-              // もし全タグを含む問題に絞りたいなら every() にする
-              // tagList.every(tag => q.tags.includes(tag))
-            );
-          });
-        }
-
         const $categorySelect = document.getElementById("category-select");
         const $difficultySelect = document.getElementById("difficulty-select");
   
@@ -516,6 +504,20 @@
       const category = document.getElementById("category-select").value;
       const levels = document.getElementById("difficulty-select").value.split(",");
       filterQuestions = structuredClone(allQuestions);
+      const { indexes,tagList } = getQueryParams();
+
+      if (tagList.length > 0) {
+        // カテゴリごとにフィルタする
+        Object.keys(filterQuestions).forEach(cat => {
+          filterQuestions[cat] = filterQuestions[cat].filter(q => 
+            tagList.every(tag => q.tags.includes(tag)) 
+            // ↑OR条件: いずれかのタグが含まれていればOK
+            // もし全タグを含む問題に絞りたいなら every() にする
+            // tagList.every(tag => q.tags.includes(tag))
+          );
+        });
+      }
+
       Object.keys(filterQuestions).forEach(cat => {
         filterQuestions[cat] = filterQuestions[cat].filter(q => 
           levels.some(levels => q.難易度.toString().includes(levels)) 
@@ -555,6 +557,20 @@
       const category = document.getElementById("category-select").value;
       const levels = document.getElementById("difficulty-select").value.split(",");
       filterQuestions = structuredClone(allQuestions);
+      const { indexes,tagList } = getQueryParams();
+
+      if (tagList.length > 0) {
+        // カテゴリごとにフィルタする
+        Object.keys(filterQuestions).forEach(cat => {
+          filterQuestions[cat] = filterQuestions[cat].filter(q => 
+            tagList.every(tag => q.tags.includes(tag)) 
+            // ↑OR条件: いずれかのタグが含まれていればOK
+            // もし全タグを含む問題に絞りたいなら every() にする
+            // tagList.every(tag => q.tags.includes(tag))
+          );
+        });
+      }
+
       Object.keys(filterQuestions).forEach(cat => {
         filterQuestions[cat] = filterQuestions[cat].filter(q => 
           levels.some(levels => q.難易度.toString().includes(levels)) 
