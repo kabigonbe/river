@@ -451,7 +451,7 @@
     let currentQuestionIndex = 0;
     let incorrectAnswers = [];
     let resultAnswers = [];
-    const maxQuestions = 10;
+    let maxQuestions = 10;
 
     // JSONデータを取得する関数
     async function loadJson() {
@@ -588,7 +588,8 @@
       }
     
       questions = questionList.map(q => ({ ...q, category }));
-      document.getElementById("total-questions").textContent = questions.length;
+      maxQuestions = questions.length;
+      document.getElementById("total-questions").textContent = maxQuestions;
     }
     function selectedQuestionsAndStart(){
       updateQuestions();
@@ -765,6 +766,7 @@
       }
 
       document.getElementById("mathfield").setValue("");
+      console.log(maxQuestions)
       if (currentQuestionIndex < maxQuestions - 1) {
           currentQuestionIndex++;
           createQuiz();
