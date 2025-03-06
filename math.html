@@ -533,6 +533,11 @@
       rangeSelect.innerHTML = "";
       questionRanges[category] = [];
     
+      let randomOption = document.createElement("option");
+      randomOption.value = "random";
+      randomOption.textContent = "ランダム10問";
+      rangeSelect.appendChild(randomOption);
+
       for (let i = 1; i <= maxIndex; i += 10) {
         let end = Math.min(i + 9, maxIndex);
         let option = document.createElement("option");
@@ -545,11 +550,6 @@
       allOption.value = "all";
       allOption.textContent = "全ての問題";
       rangeSelect.appendChild(allOption);
-    
-      let randomOption = document.createElement("option");
-      randomOption.value = "random";
-      randomOption.textContent = "ランダム10問";
-      rangeSelect.appendChild(randomOption);
     
       rangeSelect.selectedIndex = 0;
       init();
