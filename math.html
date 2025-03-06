@@ -901,7 +901,7 @@ function endQuiz() {
     const Ids = incorrectAnswers.map(q => `${q.category}_${q.index}`);
     url = window.location.href.split("?")[0] + "?index=" + Ids.join(",");
     console.log(url)
-    if (window.confirm("再挑戦用URLをクリップボードにコピーしますか？\n")) {
+    if (window.confirm(`再挑戦用URLをクリップボードにコピーしますか？\n${url}\n`)) {
         // OKを押したらクリップボードにコピー
         navigator.clipboard.writeText(url)
             .then(() => alert("URLをコピーしました！"))
