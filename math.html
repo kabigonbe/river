@@ -619,6 +619,10 @@
       isCorrect = 0;
 
       const question = questions[index];
+      let formattedIds = question.類題ids.map(id => 
+          typeof id === "number" ? `${question.category}_${id}` : id
+      );
+
       correctAnswers[index] = {
           category:question.category,
           index: question.index,
@@ -628,7 +632,7 @@
           解説:  (question.解説 || "").replace(/。/g, "<br>"),
           tags:   question.tags,
           難易度: question.難易度,
-          類題ids:question.類題ids,
+          類題ids:formattedIds,
 
           type: question.type,
           correct:"×",
