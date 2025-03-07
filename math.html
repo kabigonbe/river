@@ -463,7 +463,7 @@
 //        const response = await fetch('http://192.168.3.7:8000/jsons/question.json');
         allQuestions = await response.json(); // ここで questions にデータを格納
         filterQuestions = structuredClone(allQuestions);
-        const { indexes,tagList } = getQueryParams();
+        const { indexes,tagList,category } = getQueryParams();
 
         const $categorySelect = document.getElementById("category-select");
         const $difficultySelect = document.getElementById("difficulty-select");
@@ -476,7 +476,11 @@
         });
 
         // 初回のカテゴリを選択
-        $categorySelect.selectedIndex = 0;
+        if(category === null){
+          $categorySelect.selectedIndex = 0;
+        }else{
+          $categorySelect.value = category;
+        }
         updateQuestionRanges();
   
         $categorySelect.addEventListener("change", updateQuestionRanges);
@@ -504,10 +508,12 @@
     }
 
     function updateQuestionRanges() {
-      const category = document.getElementById("category-select").value;
       const levels = document.getElementById("difficulty-select").value.split(",");
       filterQuestions = structuredClone(allQuestions);
-      const { indexes,tagList } = getQueryParams();
+      let { indexes,tagList,category } = getQueryParams();
+//      if (category === null){
+//        category = document.getElementById("category-select").value;
+//      }
 
       if (tagList.length > 0) {
         // カテゴリごとにフィルタする
@@ -557,11 +563,13 @@
     }
 
     function updateQuestions(){
-      const category = document.getElementById("category-select").value;
+//      const category = document.getElementById("category-select").value;
       const levels = document.getElementById("difficulty-select").value.split(",");
+      let { indexes,tagList,category } = getQueryParams();
       filterQuestions = structuredClone(allQuestions);
-      const { indexes,tagList } = getQueryParams();
-
+//      if (category === null){
+//        category = document.getElementById("category-select").value;
+//      }
       if (tagList.length > 0) {
         // カテゴリごとにフィルタする
         Object.keys(filterQuestions).forEach(cat => {
@@ -769,7 +777,6 @@
       }
 
       document.getElementById("mathfield").setValue("");
-      console.log(maxQuestions)
       if (currentQuestionIndex < maxQuestions - 1) {
           currentQuestionIndex++;
           createQuiz();
@@ -803,7 +810,6 @@ function endQuiz() {
 //    console.log(totalScore);
 //    console.log(questions.length);
     if (totalScore === questions.length) {
-//        console.log("aaa")
         finalMessage.textContent = `🎉 完璧です！全問正解おめでとうございます！ 🎉`;
     } else {
         finalMessage.textContent = `全問解答完了！お疲れ様でした🎉`;
@@ -840,7 +846,6 @@ function endQuiz() {
                 </button>
             `;
           }
-            console.log(q.category);
             html += `
                 <table class="result-table">
                     <tr><th>index</th><td>
@@ -931,6 +936,7 @@ function endQuiz() {
   function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
     const indexParam = params.get("index");
+    const CategoryParam = params.get("category");
     const tagParam = params.get("tags");
 
     let indexes = [];
@@ -943,7 +949,7 @@ function endQuiz() {
       // カンマ区切りで分割し、["計算", "工夫"]などの配列にする
       tagList = tagParam.split(",");
     }
-    return { indexes, tagList };
+    return { indexes, tagList,category:CategoryParam };
   }
 
 
