@@ -843,7 +843,13 @@ function endQuiz() {
 //      <button class="relation-button" onclick="tryRelations('${q.類題ids}')">
           let buttonHtml = "";
           if (q.類題ids.length > 0) {
-            let relation_link = window.location.href.split("?")[0] + "?index=" + q.類題ids.join(",");
+
+            let selectedIds = q.類題ids
+              .sort(() => Math.random() - 0.5) // ランダムに並び替え
+              .slice(0, 10); // 先頭10個を取得
+            
+            let relation_link = window.location.href.split("?")[0] + "?index=" + selectedIds.join(",");
+
             buttonHtml = `
                 <button class="relation-button" onclick="window.open('${relation_link}','_blank')">
                     類題を解いてみる
