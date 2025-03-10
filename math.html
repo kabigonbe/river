@@ -482,7 +482,7 @@
           $categorySelect.value = category;
         }
         updateQuestionRanges();
-  
+        console.log(filterQuestions);
         $categorySelect.addEventListener("change", updateQuestionRanges);
         $categorySelect.addEventListener("change", selectedQuestionsAndStart);
         $difficultySelect.addEventListener("change", updateQuestionRanges);
