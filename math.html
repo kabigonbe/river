@@ -567,9 +567,9 @@
       const levels = document.getElementById("difficulty-select").value.split(",");
       let { indexes,tagList,category } = getQueryParams();
       filterQuestions = structuredClone(allQuestions);
-//      if (category === null){
-//        category = document.getElementById("category-select").value;
-//      }
+      if (category === null){
+        category = document.getElementById("category-select").value;
+      }
       if (tagList.length > 0) {
         // カテゴリごとにフィルタする
         Object.keys(filterQuestions).forEach(cat => {
